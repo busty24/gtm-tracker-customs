@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Declaration AI â GTM Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; }
+
+    /* Loading */
+    #loading-overlay { position: fixed; inset: 0; background: #0f1923; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity .5s; }
+    #loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid #1e3a5f; border-top-color: #3b82f6; border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 16px; }
+    .loading-text { color: #94a3b8; font-size: 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Header */
+    header { background: #0f1923; color: white; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.4); flex-wrap: wrap; gap: 12px; }
+    .header-left h1 { font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
+    .header-left p { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .progress-badge { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 700; color: #f59e0b; white-space: nowrap; }
+    .team-btn { background: #1e3a5f; border: 1px solid #2563eb; color: #93c5fd; padding: 7px 14px; border-radius: 7px; font-size: 13px; cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .team-btn:hover { background: #1d4ed8; }
+    #sync-status { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 5px 10px; border-radius: 6px; background: #1e293b; border: 1px solid #334155; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .sync-dot.pulse { animation: pulse-anim 1.5s infinite; }
+    @keyframes pulse-anim { 0%,100%{opacity:1} 50%{opacity:.3} }
+    #sync-status.synced .sync-dot { background: #10b981; }
+    #sync-status.syncing .sync-dot { background: #f59e0b; }
+    #sync-status.error .sync-dot { background: #ef4444; }
+    #sync-status.updated .sync-dot { background: #3b82f6; }
+
+    /* Filter Bar */
+    #filter-bar { background: #1a2535; border-bottom: 1px solid #2d3748; padding: 10px 28px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .filter-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-right: 4px; }
+    .filter-chip { border: 1px solid #334155; background: transparent; color: #94a3b8; padding: 4px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+    .filter-chip:hover { border-color: #64748b; color: #e2e8f0; }
+    .filter-chip.active { background: #2563eb; border-color: #2563eb; color: white; font-weight: 600; }
+    .chip-avatar { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: white; flex-shrink: 0; }
+
+    /* KPI Tiles */
+    #kpi-section { padding: 20px 28px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .kpi-tile { background: white; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); position: relative; overflow: hidden; }
+    .kpi-tile:nth-child(1) { border-left: 4px solid #3b82f6; }
+    .kpi-tile:nth-child(2) { border-left: 4px solid #10b981; }
+    .kpi-tile:nth-child(3) { border-left: 4px solid #8b5cf6; }
+    .kpi-tile:nth-child(4) { border-left: 4px solid #f59e0b; }
+    .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #64748b; margin-bottom: 8px; }
+    .kpi-value input { font-size: 28px; font-weight: 800; color: #0f1923; border: none; outline: none; width: 100%; background: transparent; -moz-appearance: textfield; }
+    .kpi-value input::-webkit-outer-spin-button, .kpi-value input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .kpi-target { font-size: 11px; color: #94a3b8; margin-top: 6px; }
+    .kpi-icon { position: absolute; right: 16px; top: 16px; font-size: 22px; opacity: .35; }
+
+    /* Current Focus */
+    #focus-section { margin: 18px 28px 0; background: #0f2742; border: 1px solid #1e4a7a; border-radius: 12px; padding: 18px 22px; }
+    .focus-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #3b82f6; font-weight: 700; margin-bottom: 6px; }
+    .focus-title { font-size: 17px; font-weight: 700; color: white; margin-bottom: 6px; }
+    .focus-desc { font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 12px; }
+    .focus-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .focus-tag { background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.3); color: #93c5fd; padding: 4px 10px; border-radius: 5px; font-size: 12px; }
+
+    /* Action Bar */
+    #action-bar { margin: 14px 28px 0; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-reset { background: transparent; border: 1px solid #334155; color: #64748b; padding: 8px 18px; border-radius: 7px; font-size: 13px; cursor: pointer; transition: all .15s; }
+    .btn-reset:hover { border-color: #ef4444; color: #ef4444; }
+    .btn-save { background: #16a34a; border: none; color: white; padding: 8px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn-save:hover { background: #15803d; }
+
+    /* Phases */
+    #phases-container { padding: 18px 28px 48px; display: flex; flex-direction: column; gap: 18px; }
+    .phase-card { background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden; }
+    .phase-header { padding: 18px 22px; display: flex; align-items: flex-start; justify-content: space-between; cursor: pointer; user-select: none; border-left: 5px solid transparent; transition: background .15s; }
+    .phase-header:hover { background: #f8fafc; }
+    .ph-left { flex: 1; }
+    .phase-num { font-size: 11px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
+    .phase-title { font-size: 17px; font-weight: 700; color: #0f1923; }
+    .phase-timeline { font-size: 12px; color: #64748b; margin-top: 3px; }
+    .phase-goal { font-size: 12px; color: #475569; margin-top: 6px; line-height: 1.45; max-width: 680px; }
+    .ph-right { display: flex; align-items: flex-start; gap: 14px; flex-shrink: 0; margin-left: 16px; }
+    .phase-prog-count { font-size: 15px; font-weight: 700; color: #0f1923; text-align: right; }
+    .phase-prog-label { font-size: 10px; color: #94a3b8; text-align: right; }
+    .phase-chevron { font-size: 14px; color: #94a3b8; transition: transform .2s; margin-top: 2px; flex-shrink: 0; }
+    .phase-chevron.open { transform: rotate(180deg); }
+    .phase-progress-bar { height: 3px; background: #f1f5f9; }
+    .phase-progress-fill { height: 3px; transition: width .4s; }
+    .phase-body { padding: 0 22px 18px; display: none; }
+    .phase-body.open { display: block; }
+
+    /* Phase colors */
+    .pc-p1 .phase-header { border-left-color: #3b82f6; } .pc-p1 .phase-num { color: #3b82f6; } .pc-p1 .phase-progress-fill { background: #3b82f6; }
+    .pc-p2 .phase-header { border-left-color: #10b981; } .pc-p2 .phase-num { color: #10b981; } .pc-p2 .phase-progress-fill { background: #10b981; }
+    .pc-p3 .phase-header { border-left-color: #f59e0b; } .pc-p3 .phase-num { color: #f59e0b; } .pc-p3 .phase-progress-fill { background: #f59e0b; }
+    .pc-p4 .phase-header { border-left-color: #8b5cf6; } .pc-p4 .phase-num { color: #8b5cf6; } .pc-p4 .phase-progress-fill { background: #8b5cf6; }
+    .pc-p5 .phase-header { border-left-color: #ec4899; } .pc-p5 .phase-num { color: #ec4899; } .pc-p5 .phase-progress-fill { background: #ec4899; }
+    .pc-p6 .phase-header { border-left-color: #06b6d4; } .pc-p6 .phase-num { color: #06b6d4; } .pc-p6 .phase-progress-fill { background: #06b6d4; }
+    .pc-p7 .phase-header { border-left-color: #ef4444; } .pc-p7 .phase-num { color: #ef4444; } .pc-p7 .phase-progress-fill { background: #ef4444; }
+
+    /* Section */
+    .phase-section { margin-top: 8px; }
+    .section-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; padding: 14px 0 7px; border-bottom: 1px solid #f1f5f9; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
+    .section-count { font-size: 10px; color: #cbd5e1; font-weight: 400; }
+
+    /* Task row */
+    .task-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 2px; border-bottom: 1px solid #f8fafc; }
+    .task-row:last-child { border-bottom: none; }
+    .task-row.completed .task-text { text-decoration: line-through; color: #94a3b8; }
+    .task-row.hidden-by-filter { display: none; }
+    .task-checkbox { width: 17px; height: 17px; border-radius: 4px; border: 2px solid #cbd5e1; cursor: pointer; flex-shrink: 0; margin-top: 1px; appearance: none; -webkit-appearance: none; transition: all .15s; }
+    .task-checkbox:checked { background: #10b981; border-color: #10b981; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; }
+    .task-text { flex: 1; font-size: 13.5px; color: #334155; line-height: 1.5; }
+    .task-assign-wrap { flex-shrink: 0; position: relative; }
+    .assign-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; cursor: pointer; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: transform .1s; }
+    .assign-avatar:hover { transform: scale(1.12); }
+    .assign-avatar.unassigned { background: #e2e8f0; color: #94a3b8; font-size: 13px; font-weight: 400; border-color: #cbd5e1; }
+
+    /* Assign dropdown */
+    .assign-dropdown { position: absolute; right: 0; top: 30px; background: white; border: 1px solid #e2e8f0; border-radius: 9px; box-shadow: 0 4px 20px rgba(0,0,0,.12); z-index: 50; min-width: 160px; overflow: hidden; }
+    .assign-option { display: flex; align-items: center; gap: 9px; padding: 8px 13px; font-size: 13px; color: #334155; cursor: pointer; transition: background .1s; }
+    .assign-option:hover { background: #f1f5f9; }
+    .ao-avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: white; flex-shrink: 0; }
+    .assign-divider { height: 1px; background: #f1f5f9; margin: 2px 0; }
+
+    /* Team Modal */
+    #team-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: center; justify-content: center; }
+    #team-overlay.open { display: flex; }
+    .modal-box { background: white; border-radius: 14px; width: 420px; max-width: 95vw; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+    .modal-hd { padding: 18px 22px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+    .modal-hd-title { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; line-height: 1; }
+    .modal-bd { padding: 18px 22px; overflow-y: auto; flex: 1; }
+    .m-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; min-height: 40px; }
+    .m-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8fafc; border-radius: 8px; }
+    .m-av { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+    .m-name { flex: 1; font-size: 14px; font-weight: 500; }
+    .m-rm { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; transition: color .15s; line-height: 1; }
+    .m-rm:hover { color: #ef4444; }
+    .add-form { border-top: 1px solid #f1f5f9; padding-top: 16px; }
+    .add-form-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #64748b; margin-bottom: 10px; }
+    .add-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .add-input { flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 13px; outline: none; transition: border-color .15s; }
+    .add-input:focus { border-color: #3b82f6; }
+    .add-btn { background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .add-btn:hover { background: #1d4ed8; }
+    .swatches { display: flex; gap: 7px; flex-wrap: wrap; }
+    .swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform .1s; }
+    .swatch:hover { transform: scale(1.2); }
+    .swatch.sel { border-color: #0f1923; transform: scale(1.15); }
+    .empty-m { color: #94a3b8; font-size: 13px; text-align: center; padding: 10px 0; }
+
+    @media (max-width: 640px) {
+      header, #filter-bar, #kpi-section, #focus-section, #action-bar, #phases-container { padding-left: 14px; padding-right: 14px; }
+      #kpi-section { grid-template-columns: 1fr 1fr; }
+      .phase-goal { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading shared progressâ¦</div>
+</div>
+
+<div id="team-overlay">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-hd-title">ð¥ Team Members</div>
+      <button class="modal-close" id="modal-close">Ã</button>
+    </div>
+    <div class="modal-bd">
+      <div class="m-list" id="m-list"></div>
+      <div class="add-form">
+        <div class="add-form-title">Add Team Member</div>
+        <div class="add-row">
+          <input type="text" class="add-input" id="new-name" placeholder="Nameâ¦" maxlength="24" />
+          <button class="add-btn" id="add-btn">Add</button>
+        </div>
+        <div class="swatches" id="swatches"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="header-left">
+    <h1>Declaration AI â GTM Tracker</h1>
+    <p>Latvia &amp; EU Expansion Â· 2026 Â· Baltic AI / LETT 2000 SIA</p>
+  </div>
+  <div class="header-right">
+    <button class="team-btn" id="team-btn">ð¥ Team</button>
+    <div id="sync-status" class="syncing">
+      <div class="sync-dot pulse"></div>
+      <span id="sync-label">Connectingâ¦</span>
+    </div>
+    <div class="progress-badge"><span id="ovr-pct">0</span>% Overall</div>
+  </div>
+</header>
+
+<div id="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-chip active" data-fid="all">All Tasks</button>
+  <span id="member-chips"></span>
+</div>
+
+<div id="kpi-section"></div>
+<div id="focus-section"></div>
+
+<div id="action-bar">
+  <button class="btn-reset" id="reset-btn">Reset All</button>
+  <button class="btn-save" id="save-btn">ð¾ Save Progress</button>
+</div>
+
+<div id="phases-container"></div>
+
+<script>
+/* ââ SUPABASE ââ */
+const SUPABASE_URL = "https://nrdtiztxrbkhmvrqvojd.supabase.co";
+const SUPABASE_KEY = "sb_publishable__GheKX72SoYJyWibDxrCtA_zAquucq_";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ââ PALETTE ââ */
+const PALETTE = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#64748b'];
+let selColor = PALETTE[0];
+let activeFilter = 'all';
+let openDropTask = null;
+
+/* ââ DATA ââ */
+const KPIS = [
+  { id:'kpi_cust', label:'Paying Customers', icon:'ð¥', target:'â 20 target' },
+  { id:'kpi_mrr',  label:'Monthly MRR (â¬)',  icon:'ð¶', target:'â â¬15K target' },
+  { id:'kpi_ctry', label:'Countries Active', icon:'ð', target:'â 5 countries' },
+  { id:'kpi_cap',  label:'Capital Raised (â¬)',icon:'ð', target:'â â¬500K target' },
+];
+
+const PHASES = [
+  { id:'p1', num:'01', color:'#3b82f6',
+    title:'Foundation & Demo Readiness',
+    timeline:'Months 1â2 Â· MarâApr 2026',
+    goal:'Polish Declaration AI for external demos, build the public landing page, define pricing, and compile a 30+ target list of Latvian customs brokers. Nothing leaves LETT 2000 until the product is demo-ready.',
+    tags:['Product audit','Landing page','Pricing structure','30+ broker target list'],
+    sections:[
+      { t:'WEEK 1â2 â PRODUCT POLISH', tasks:[
+        { id:'p1-audit',    t:'Conduct full audit across all 10 modules â test with real LETT 2000 declarations, document any gaps or edge cases in the workflow' },
+        { id:'p1-asian',    t:'Fix Asian-language product name handling: ensure Latvian translations are accurate for Japanese/Chinese imports (Yaskawa servo motors, cables, etc.)' },
+        { id:'p1-upload',   t:'Improve multi-document upload UX â add progress indicators, clear file status labels, reduce friction for first-time external users' },
+        { id:'p1-errors',   t:'Add proper error messages and loading states throughout the app â critical for demos and paid customers who cannot tolerate silent failures' },
+        { id:'p1-conflict', t:'Polish conflict resolution UI â make it crystal clear what the user must decide and why, always show source document labels (INVOICE vs AWB vs PACKING_LIST)' },
+        { id:'p1-demoacc',  t:'Set up a clean demo account with 3 pre-loaded sample declarations using anonymised LETT 2000 data: one import, one export, one complex multi-document shipment' },
+      ]},
+      { t:'WEEK 2â4 â LANDING PAGE BUILD', tasks:[
+        { id:'p1-domain',   t:'Register declarationai.eu (or declarationai.com) â connect DNS to Vercel, set up SSL, create professional email (hello@declarationai.eu)' },
+        { id:'p1-lpcopy',   t:'Write landing page copy: hero headline, value proposition, 6 feature bullets, workflow section, social proof (473+ declarations, live since Sep 2025, LETT 2000 quote)' },
+        { id:'p1-lpbuild',  t:'Design and build the public landing page â sections: Hero, Features, How It Works (workflow), Social Proof, Pricing Teaser, Demo CTA. Match Declaration AI brand: blue primary, white background' },
+        { id:'p1-demofrm',  t:'Add Request a Demo CTA form with email capture â route submissions to Declaration AI Leads module + send immediate email notification to team' },
+        { id:'p1-video',    t:'Record a 2â3 minute product walkthrough video: document upload â AI extraction â TARIC classification â conflict resolution â XML download for EDS submission' },
+        { id:'p1-ga',       t:'Set up Google Analytics 4 and Google Search Console â track demo form submissions as conversion events, monitor traffic sources from day one' },
+      ]},
+      { t:'WEEK 3â4 â SALES MATERIALS', tasks:[
+        { id:'p1-deck',     t:'Create 10-slide demo pitch deck: Problem â Declaration AI Solution â Key Features (5) â Live Workflow Demo â LETT 2000 Results â Pricing â Pilot Offer â Next Steps' },
+        { id:'p1-pricing',  t:'Define and publish pricing tiers: Starter â¬500/mo (1 user, 50 decl/mo), Professional â¬1,200/mo (5 users, unlimited), Enterprise (custom) â publish on landing page pricing section' },
+        { id:'p1-roi',      t:'Build 1-page ROI calculator: inputs = team size + declarations per month â outputs = hours saved per week + â¬â¬ cost reduction. Use in demo calls to personalise value' },
+        { id:'p1-pilot',    t:'Draft pilot agreement template: 30-day free trial terms, light SLA, data privacy and NDA clauses, what happens at the end of trial (pricing, exit)' },
+        { id:'p1-onepage',  t:'Create 1-page product overview PDF for cold email attachments: problem, solution, 3 differentiators vs manual process, LETT 2000 quote, contact info' },
+      ]},
+      { t:'WEEK 3â4 â TARGET LIST BUILDING', tasks:[
+        { id:'p1-research',  t:'Research all licensed customs agents and brokers in Latvia via the CSDD register and Latvian Customs Authority database â list every authorised firm' },
+        { id:'p1-targlist',  t:'Build outreach spreadsheet (30+ entries): company name, contact person name, email, LinkedIn URL, estimated declaration volume, primary trade routes handled' },
+        { id:'p1-rank',      t:'Rank targets by: (1) air freight volume at Riga Airport LV000240, (2) Asian import routes with translation complexity, (3) company size and team count' },
+        { id:'p1-warmintro', t:'Ask LETT 2000 team for warm introductions to peer brokers â warm referrals convert 5â10Ã better than cold outreach and close faster' },
+      ]},
+    ]
+  },
+  { id:'p2', num:'02', color:'#10b981',
+    title:'Latvian Market Outreach & Pilots',
+    timeline:'Months 2â3 Â· AprâMay 2026',
+    goal:'Run structured outreach to 30+ brokers, book at least 8 demo calls, and sign 3â5 pilot agreements. Focus on brokers handling Asian import routes â they suffer most from document variety and Latvian translation complexity.',
+    tags:['Cold email campaign','8+ demo calls','3â5 pilot agreements','30-day onboarding support'],
+    sections:[
+      { t:'WEEK 5â6 â OUTREACH CAMPAIGN', tasks:[
+        { id:'p2-emailseq', t:'Send personalised cold email sequence to 30 target brokers â 3-email cadence: (1) intro + 1 specific insight about their routes, (2) demo offer with ROI stats, (3) final follow-up after 5 days' },
+        { id:'p2-linkedin', t:'Connect with decision-makers on LinkedIn (operations directors, customs managers) â personalised InMails referencing specific trade routes or cargo types they handle' },
+        { id:'p2-assoc',    t:'Reach out to Latvian Customs Brokers Association â request an introduction email to members or a speaking slot at their next quarterly meeting' },
+        { id:'p2-events',   t:'Attend Riga logistics and trade events â bring demo device, collect business cards, aim for 10+ meaningful face-to-face conversations with potential buyers' },
+        { id:'p2-warmcall', t:'Phone-call all warm intro leads from LETT 2000 network within 48 hours â these are highest priority, try to book a demo during the first call itself' },
+      ]},
+      { t:'WEEK 7â8 â DEMO CALLS', tasks:[
+        { id:'p2-bookdemo', t:'Book minimum 8 demo calls from outreach responses â video call + screen share, 30â45 minutes, calendar invite with prep materials attached' },
+        { id:'p2-rundemo',  t:'Run demos: show Asian-import workflow (Yaskawa motors as example) â TARIC classification with AI explanation â conflict resolution â POA lookup â XML download. Use pre-loaded demo account' },
+        { id:'p2-feedback', t:'Collect structured feedback after every demo: biggest current pain, what impressed them most, what is missing from the product, reaction to pricing tier' },
+        { id:'p2-fu24h',    t:'Send personalised follow-up email within 24 hours: recap, pricing document, pilot agreement offer. Speed and personalisation signal you are serious' },
+        { id:'p2-objdoc',   t:'Document every objection raised across all demo calls and prepare rebuttal scripts â build institutional sales knowledge for future team members or hires' },
+      ]},
+      { t:'WEEK 8â10 â PILOT ONBOARDING', tasks:[
+        { id:'p2-pilotsign', t:'Sign pilot agreements with 3â5 brokers â 30-day free trial with onboarding support included. Counter-sign within 24 hours, do not let enthusiasm cool' },
+        { id:'p2-accsetup',  t:'Set up pilot accounts: create user profiles, configure USER/ADMIN roles, import any existing POA documents from the broker into the platform' },
+        { id:'p2-training',  t:'Run 1-hour onboarding session per pilot via video call: live declaration walkthrough, TARIC search and memory demo, POA management, XML download flow' },
+        { id:'p2-firstdecl', t:'Join pilot on video call for their first 2â3 real declarations on the platform â catch friction points in real-time and fix within 24 hours' },
+        { id:'p2-checkins',  t:'Set up weekly 15-min check-in calls with each pilot during the 30-day trial â track: declarations processed, issues found, satisfaction score (1â10)' },
+        { id:'p2-metrics',   t:'Track pilot metrics in a weekly dashboard: declarations processed, average time per declaration vs their old process, TARIC acceptance rate, support tickets' },
+      ]},
+    ]
+  },
+  { id:'p3', num:'03', color:'#f59e0b',
+    title:'First Revenue & Customer Success',
+    timeline:'Months 3â4 Â· MayâJun 2026',
+    goal:'Convert 2â3 pilots to paid subscriptions, hit â¬2K+ MRR, get a publishable LETT 2000 case study and written testimonials. These are the minimum proof-points required before approaching investors.',
+    tags:['Pilot-to-paid conversion','â¬2K MRR milestone','Case study','Written testimonials'],
+    sections:[
+      { t:'PILOT-TO-PAID CONVERSION', tasks:[
+        { id:'p3-data',    t:'Analyse 30-day pilot data per customer: declarations processed, time saved vs manual process, errors caught â build conversion pitch using their own numbers, not generic claims' },
+        { id:'p3-fixes',   t:'Address top 3 feedback items from each pilot before making the conversion ask â show you respond fast and treat them as a partner, not just a user' },
+        { id:'p3-convmtg', t:'Run conversion meeting with each pilot: open with their personal ROI data, walk through subscription options, handle objections with prepared rebuttal scripts' },
+        { id:'p3-contract',t:'Sign minimum 2 paid subscription contracts at â¬500â1,500/month based on team size and declaration volume â get first invoices sent within the same week' },
+        { id:'p3-payment', t:'Set up payment infrastructure: Stripe recurring billing or SEPA bank transfer + proper invoicing, subscription tracking, automated renewal reminders' },
+        { id:'p3-mrr2k',   t:'ð¯ Hit â¬2,000 MRR milestone â document this date and share internally. This is the minimum credibility threshold required before approaching investors' },
+      ]},
+      { t:'CUSTOMER SUCCESS INFRASTRUCTURE', tasks:[
+        { id:'p3-health',  t:'Build a simple customer health scorecard: weekly declarations processed, percentage of modules adopted, open support tickets, NPS or satisfaction score' },
+        { id:'p3-docs',    t:'Write basic product documentation: getting started guide, module reference for each of the 10 features, FAQ for common errors â host on Notion or a simple docs site' },
+        { id:'p3-support', t:'Set up support flow: dedicated email address per customer or shared Slack channel, response SLA < 4 business hours, escalation path for critical bugs' },
+        { id:'p3-review',  t:'Run first monthly business review with each paying customer â present their usage data, collect structured feedback, share the product roadmap for their input' },
+        { id:'p3-expand',  t:'Identify expansion opportunities within each customer: additional user seats, adopting unused modules (e.g. Product Research), white-glove onboarding for new team members' },
+      ]},
+      { t:'SOCIAL PROOF & CASE STUDIES', tasks:[
+        { id:'p3-letcase',  t:'Write LETT 2000 case study: time savings (X hours/week â Y minutes per declaration since Sep 2025), error reduction, declarations processed â get written sign-off for public use' },
+        { id:'p3-testims',  t:'Collect 2â3 written testimonials from pilot and paying customers â 2 sentences minimum on specific value received. Name, job title, company â no anonymous quotes' },
+        { id:'p3-casepdf',  t:'Design the case study as a shareable PDF and a landing page section â use in sales process, investor pitch deck, and LinkedIn content posts' },
+        { id:'p3-pr',       t:'Pitch an article to Baltic trade and logistics publications: lvportals.lv, Baltic Logistics Today, FIATA member publications â AI in EU customs is a timely editorial angle' },
+      ]},
+    ]
+  },
+  { id:'p4', num:'04', color:'#8b5cf6',
+    title:'Landing Page & Inbound Marketing',
+    timeline:'Months 3â5 Â· MayâJul 2026',
+    goal:'Launch the public Declaration AI website, establish a LinkedIn presence, and build an inbound pipeline so growth is not solely dependent on outbound cold calls and emails.',
+    tags:['Launch declarationai.eu','LinkedIn company page','2 blog posts','Demo booking funnel'],
+    sections:[
+      { t:'WEBSITE & BRAND LAUNCH', tasks:[
+        { id:'p4-lplaunch', t:'Launch declarationai.eu publicly with all sections live: hero, feature breakdown, workflow walkthrough, pricing page, LETT 2000 case study, testimonials, demo booking CTA' },
+        { id:'p4-linkedin', t:'Create Declaration AI LinkedIn Company Page â professional logo, banner image, product description, website link, weekly posting cadence plan' },
+        { id:'p4-personal', t:'Update founding team LinkedIn profiles to reflect Declaration AI roles â begin posting 1Ã per week from personal accounts (significantly more reach than company page at this stage)' },
+        { id:'p4-dirs',     t:'Submit Declaration AI to relevant directories: G2, Capterra, Product Hunt (EU launch), EU-Startups database, BuiltInLatvia or equivalent Baltic startup registries' },
+        { id:'p4-adstest',  t:'Run â¬300 test Google Ads campaign on "customs declaration software EU", "TARIC classification tool", "EU customs broker software" â measure CPC and lead quality before scaling' },
+      ]},
+      { t:'CONTENT MARKETING', tasks:[
+        { id:'p4-blog1',    t:'Write and publish blog post: "How AI is cutting customs declaration time from hours to minutes for EU brokers" â target TARIC, EDS, UCC as SEO keywords' },
+        { id:'p4-blog2',    t:'Write and publish blog post: "TARIC Classification in 2026: manual vs AI â what the accuracy gap costs your brokerage every month" â use real LETT 2000 stats' },
+        { id:'p4-livid',    t:'Post a short LinkedIn video showing the live Declaration AI workflow â share actively into Customs Brokers and EU Trade Compliance LinkedIn groups, target 2,000+ views' },
+        { id:'p4-article',  t:'Publish long-form LinkedIn article on AI in EU customs compliance â target customs professional audience, include competitive landscape context and regulatory angles' },
+        { id:'p4-seo',      t:'Complete SEO setup: meta descriptions, schema markup, XML sitemap, Google Search Console verification â target 10 priority keywords across EU customs declaration software space' },
+      ]},
+      { t:'INBOUND PIPELINE SETUP', tasks:[
+        { id:'p4-funnel',   t:'Build demo booking funnel: landing page CTA â Calendly booking page â automated confirmation email with prep materials â heasure conversion rate at every step' },
+        { id:'p4-nurture',  t:'Set up 3-email nurture sequence for all demo form signups: (1) welcome + product overview, (2) LETT 2000 case study, (3) demo call invitation with specific times' },
+        { id:'p4-leadtrk',  t:'Set up lead source tracking in Declaration AI Leads module â attribute each lead to channel: outbound email, LinkedIn, Google Ads, referral, organic search' },
+        { id:'p4-eulists',  t:'Compile or purchase EU customs broker contact lists for Estonia, Lithuania, and Netherlands â preparation for Phase 6 Baltic expansion outbound campaign' },
+      ]},
+    ]
+  },
+  { id:'p5', num:'05', color:'#ec4899',
+    title:'Investor Fundraising â Pre-Seed',
+    timeline:'Months 4â7 Â· JunâSep 2026',
+    goal:'Raise â¬300Kâ600K pre-seed after securing 2+ paying customers. Target Baltic and EU B2B SaaS investors. Use capital for Baltic EDS adapters, first sales hire, and marketing. Digicust raised â¬2.3M pre-Series A â the market is investable and timing is right.',
+    tags:['â¬300Kâ600K target','Investor pitch deck','Baltic VCs: Tera, Karma, SWG','Data room ready'],
+    sections:[
+      { t:'FUNDRAISING MATERIALS â WEEKS 1â3', tasks:[
+        { id:'p5-model',   t:'Build a 24-month financial model: current MRR base, 20â30% MoM growth assumption, CAC per channel, LTV per pricing tier, burn rate, runway post-raise â have a bear and bull case' },
+        { id:'p5-deck',    t:'Build investor pitch deck (12â15 slides): Problem â EU Market Size (SMB broker count Ã avg tech spend) â Solution â Traction (MRR + declarations) â Competition matrix â Team â Ask + Use of Funds' },
+        { id:'p5-dataroom',t:'Compile investor data room: product demo recording, MRR monthly progression, customer contracts or LOIs, competitor analysis PDF, team bios, legal incorporation documents, cap table' },
+        { id:'p5-market',  t:'Research and document TAM/SAM/SOM: number of licensed EU customs brokers per country Ã average software spend per broker per year â cite authoritative sources' },
+        { id:'p5-refltr',  t:'Get customer reference letters from LETT 2000 and at least 1 paying external customer â signed quotes and willingness to speak with investors on request' },
+        { id:'p5-terms',   t:'Define raise structure: â¬300Kâ600K at â¬1.5â3M post-money valuation. Prepare SAFE note or convertible note template with standard Baltic/EU early-stage terms' },
+      ]},
+      { t:'BALTIC & CEE INVESTORS â WEEKS 3â7', tasks:[
+        { id:'p5-tera',    t:'Apply to Tera Ventures (Tallinn) â largest Baltic VC, invests â¬200Kâ2M at seed in B2B SaaS. Lead with MRR traction and multi-market expansion roadmap. Warm intro strongly preferred.' },
+        { id:'p5-karma',   t:'Apply to Karma Ventures (Estonia) â â¬50Kâ500K tickets, Baltic/Nordic focus, known for being hands-on with early-stage B2B tech. Check their current fund vintage before applying.' },
+        { id:'p5-swg',     t:'Apply to Startup Wise Guys (Riga/Tallinn cohorts) â accelerator + â¬50â150K investment, strong CEE distribution network, quarterly applications. Strong fit for cross-Baltic expansion story.' },
+        { id:'p5-bba',     t:'Submit to Baltic Business Angels (BBA) network â individual angels with Baltic industry networks, fast decision-making at pre-seed stage, often add strategic operational value' },
+        { id:'p5-liaa',    t:'Apply to LIAA (Latvian Investment and Development Agency) innovation grants â non-dilutive funding for AI and digital tech. Research JaunuzÅÄmumu grantu programma and EIF schemes' },
+        { id:'p5-lift99',  t:'Connect with Lift99 hub (Tallinn) â strong investor introduction network across CEE, access to Estonian tech ecosystem and angels with logistics background' },
+        { id:'p5-estban',  t:'Reach out to EstBAN (Estonian Business Angels Network) and Tallinn-area angel groups â angels often commit at pre-seed faster and with less bureaucracy than institutional VCs' },
+      ]},
+      { t:'EU & LOGISTICS INVESTORS â WEEKS 5â10', tasks:[
+        { id:'p5-regtech',  t:'Research and contact RegTech/FinTech VCs: Anthemis Group, Illuminate Financial, FinTech Global â position Declaration AI as RegTech for EU trade compliance automation' },
+        { id:'p5-logvcs',   t:'Research logistics/supply chain VCs: Reefknot Investments, Dynamo Ventures, Container Ventures â frame as AI infrastructure layer for EU trade document flows' },
+        { id:'p5-angels',   t:'Target angels with customs/freight forwarding background â search FIATA member directory, ex-DHL/DB Schenker/Kuehne+Nagel executive networks on LinkedIn' },
+        { id:'p5-events',   t:'Attend Baltic and EU startup events to build investor network: Latitude59 (Tallinn), Wolves Summit, Slush (Helsinki) â always bring printed one-pager and QR-code deck link' },
+        { id:'p5-intros',   t:'Prioritise warm introductions over cold outreach everywhere â ask LIAA advisors, SWG alumni, Tera portfolio founders for specific named introductions' },
+      ]},
+      { t:'CLOSING THE ROUND â WEEKS 10â14', tasks:[
+        { id:'p5-shortlist', t:'Shortlist 3â5 serious investors for term sheet discussions â prioritise those with B2B SaaS portfolio relevance AND Baltic or EU expansion network value' },
+        { id:'p5-termsheet', t:'Negotiate term sheet: valuation cap, pro-rata rights for follow-ons, information rights. Avoid board seat at pre-seed. Target maximum 15â20% dilution.' },
+        { id:'p5-legal',     t:'Engage a startup-specialist lawyer (Ellex, SORAINEN, or TGS Baltic) for investment document review â never sign a term sheet or investment agreement without independent legal review' },
+        { id:'p5-close',     t:'Execute agreements, receive funds, update cap table, set up dedicated fundraise bank account â maintain clean accounting separation from operating expenses from day one' },
+        { id:'p5-announce',  t:'Announce fundraise publicly: LinkedIn post, press release to tech.eu, eu-startups.com, and Baltic tech media. Use the announcement as a recruiting signal and credibility boost.' },
+      ]},
+    ]
+  },
+  { id:'p6', num:'06', color:'#06b6d4',
+    title:'Baltic States Expansion â Estonia & Lithuania',
+    timeline:'Months 6â9 Â· AugâNov 2026',
+    goal:'Expand Declaration AI to Estonia and Lithuania by building country-specific EDS output adapters. Reach 8â12 paying customers across all three Baltic states. Hit â¬8K MRR and prove the multi-market roll-out playbook works.',
+    tags:['Estonia EMTA adapter','Lithuania MIDAS adapter','8â12 paying customers','â¬8K MRR'],
+    sections:[
+      { t:'ESTONIA EXPANSION', tasks:[
+        { id:'p6-ee-res',    t:'Research Estonia EMTA customs declaration system (MKD â Maksu- ja Tolliamet): XML format specification, authentication method, submission API documentation' },
+        { id:'p6-ee-adapt',  t:'Build Estonia EDS adapter: generate EMTA-compliant XML/JSON output from existing Declaration AI data model â test against EMTA sandbox environment' },
+        { id:'p6-ee-taric',  t:'Update TARIC Memory with Estonia-specific regulatory codes and classification patterns â Estonia shares EU TARIC but has some EE-specific additional codes' },
+        { id:'p6-ee-test',   t:'Test Estonia adapter with 1â2 Estonia-based pilot brokers â run 15+ real declarations, validate XML output against EMTA system requirements before go-live' },
+        { id:'p6-ee-out',    t:'Run targeted outreach to 20+ Estonian customs brokers â use Tera Ventures portfolio and Lift99 network for warm introductions to Tallinn and Tartu brokers' },
+        { id:'p6-ee-sign',   t:'ð¯ Sign 2â3 paying Estonian customers â validates the Baltic roll-out model and significantly strengthens the Series A investor narrative' },
+      ]},
+      { t:'LITHUANIA EXPANSION', tasks:[
+        { id:'p6-lt-res',    t:'Research Lithuania MuitinÄs departamentas customs system and MIDAS declaration portal: XML format requirements, field mapping, submission workflow' },
+        { id:'p6-lt-adapt',  t:'Build Lithuania MIDAS-compatible adapter: generate Lithuania-specific XML output from Declaration AI data model â test against available sandbox' },
+        { id:'p6-lt-test',   t:'Test Lithuania adapter with a Vilnius or Klaipeda pilot customs broker â Klaipeda port handles the highest import volumes in Lithuania' },
+        { id:'p6-lt-assoc',  t:'Contact Lithuanian Customs Agents Association (LCBA) â request member outreach opportunity, newsletter feature, or conference sponsor slot' },
+        { id:'p6-lt-out',    t:'Run outreach to 20+ Lithuanian customs brokers â focus on Vilnius (administrative hub) and Klaipeda (port-heavy, highest declaration volumes per broker)' },
+        { id:'p6-lt-sign',   t:'ð¯ Sign 2â3 paying Lithuanian customers â Baltic trifecta (LV + EE + LT) is a powerful proof-of-concept for investors and a defensible regional moat' },
+      ]},
+      { t:'MULTI-COUNTRY PRODUCT', tasks:[
+        { id:'p6-ctrysel',   t:'Build country selector in Declaration Processor UI: user selects Latvia / Estonia / Lithuania at session or declaration level â system routes to correct EDS output adapter' },
+        { id:'p6-routing',   t:'Implement EDS output routing engine: Latvia (existing EDS XML), Estonia (EMTA XML adapter), Lithuania (MIDAS XML adapter) â single codebase, country-configurable output' },
+        { id:'p6-pricing',   t:'Update pricing tiers: single-country â¬500â1,200/mo, Baltic multi-country package â¬1,500â2,500/mo â define a clear upgrade path from single-market to multi-market' },
+        { id:'p6-lpupdate',  t:'Update landing page: "Supports Latvia, Estonia, Lithuania customs systems" â positions Declaration AI as the go-to tool for Baltic brokers operating cross-border' },
+        { id:'p6-mrr8k',     t:'ð¯ Hit â¬8,000 MRR across all three Baltic markets â triggers readiness for EU westward expansion phase and prepares the Series A traction story' },
+      ]},
+    ]
+  },
+  { id:'p7', num:'07', color:'#ef4444',
+    title:'EU Expansion â Germany, Netherlands & ICS2 Module',
+    timeline:'Months 9â12 Â· Nov 2026âMar 2027',
+    goal:'Enter Germany (ATLAS system) and Netherlands markets. Build the ICS2 pre-arrival safety declaration module â a key regulatory differentiator most SMB tools lack. Target 15â20 paying customers total and â¬15K+ MRR. Prepare for Series A.',
+    tags:['Germany ATLAS adapter','Netherlands AGS adapter','ICS2 pre-arrival module','Series A prep'],
+    sections:[
+      { t:'GERMANY â ATLAS INTEGRATION', tasks:[
+        { id:'p7-de-res',    t:'Deep-dive Germany Zoll ATLAS system: CUSDEC XML format (UN/EDIFACT), AES export requirements, NCTS transit declarations â engage a German customs compliance specialist for guidance' },
+        { id:'p7-de-part',   t:'Identify a German customs tech partner or compliance advisor for ATLAS regulatory review â ATLAS is highly regulated and complex; local expertise is essential to avoid costly errors' },
+        { id:'p7-de-adapt',  t:'Build Germany ATLAS adapter: CUSDEC-format output for AES (export declarations) and NCTS (transit) â test against Zoll official sandbox environment' },
+        { id:'p7-de-pilot',  t:'Test ATLAS adapter with 1â2 German broker pilots in Hamburg or Duisburg â the largest freight hub clusters in Germany, highest declaration volumes' },
+        { id:'p7-de-out',    t:'Run outreach campaign to 30+ German customs brokers and freight forwarders â focus on Hamburg, Bremen, Frankfurt, Duisburg clusters â use DSLV and BGA member directories' },
+        { id:'p7-de-sign',   t:'ð¯ Sign 3â5 German paying customers at â¬1,000â2,000/month â German market has higher pricing tolerance than Baltics due to larger declaration volumes per broker' },
+      ]},
+      { t:'NETHERLANDS EXPANSION', tasks:[
+        { id:'p7-nl-res',    t:'Research Netherlands Douane AGS system (Aangiftesysteem Goederen): XML field requirements, submission API, Rotterdam and Schiphol air cargo-specific workflow considerations' },
+        { id:'p7-nl-adapt',  t:'Build Netherlands AGS adapter â Netherlands is the #1 EU import gateway (Rotterdam port), so the average broker handles very high declaration volumes' },
+        { id:'p7-nl-out',    t:'Outreach to Rotterdam and Amsterdam customs brokers and freight forwarders â prioritise those handling Schiphol air cargo and Rotterdam sea freight flows' },
+        { id:'p7-nl-sign',   t:'ð¯ Sign 2â3 Netherlands paying customers â BeNeLux foothold also opens the door for a white-label partnership discussion with Stream Software' },
+      ]},
+      { t:'ICS2 PRE-ARRIVAL SAFETY FILING MODULE', tasks:[
+        { id:'p7-ics2-res',  t:'Research ICS2 (Import Control System 2) requirements in full: Entry Summary Declaration (ENS) field requirements, filing timelines (4h/24h before arrival), who is obligated â broker vs carrier' },
+        { id:'p7-ics2-scp',  t:'Scope the ICS2 module: which data from existing extraction pipeline is reusable, what new fields are required (UCR, LRN, safety data), UI design for the pre-arrival filing flow' },
+        { id:'p7-ics2-bld',  t:'Build ICS2 pre-arrival safety declaration module â integrate with the document upload and extraction pipeline, generate ICS2-compliant XML for EU Customs Data Hub submission' },
+        { id:'p7-ics2-tst',  t:'Test ICS2 module with customers handling Riga air cargo (LV000240 Lidostas MKP) â air imports require 4-hour pre-arrival filing, the ideal real-world test case' },
+        { id:'p7-ics2-mkt',  t:'Actively market the ICS2 capability â most SMB tools including Digicust and Customs4trade have limited ICS2 coverage. Feature prominently on landing page and LinkedIn.' },
+      ]},
+      { t:'SCALE & SERIES A PREPARATION', tasks:[
+        { id:'p7-hire-s',    t:'Make first sales/BD hire using raised capital â ideally German or Dutch speaking with customs or logistics background, immediately owns DE and NL pipeline and deal execution' },
+        { id:'p7-hire-cs',   t:'Hire a Customer Success manager â once the customer count exceeds 10, CS quality becomes a retention and expansion risk that cannot be managed by the founding team alone' },
+        { id:'p7-mrr15k',    t:'ð¯ Hit â¬15,000 MRR across LV + EE + LT + DE + NL â the minimum credible threshold for Series A conversations with top-tier EU B2B SaaS investors' },
+        { id:'p7-cust20',    t:'ð¯ Reach 20 paying customers across 5 markets â proves the multi-market GTM playbook is repeatable, which is the core Series A investment thesis' },
+        { id:'p7-series-a',  t:'Prepare Series A materials: 18-month cohort retention data, NRR, churn rate, CAC by market, unit economics per tier â target â¬2â5M Series A at 5â8Ã ARR valuation' },
+        { id:'p7-sa-vcs',    t:'Outreach to EU-focused Series A VCs: Balderton Capital, Point Nine Capital, Northzone, Target Global, Dawn Capital â all have strong B2B SaaS and RegTech portfolios' },
+      ]},
+    ]
+  },
+];
+
+/* ââ STATE ââ */
+let state = {
+  checked: {}, kpis: { kpi_cust:0, kpi_mrr:0, kpi_ctry:0, kpi_cap:0 },
+  collapsed: {}, members: [], assignments: {},
+};
+let _timer = null, _suppress = false;
+
+/* ââ HELPERS ââ */
+function allTasks() { const r=[]; PHASES.forEach(ph=>ph.sections.forEach(s=>s.tasks.forEach(t=>r.push(t)))); return r; }
+function getTask(id) { return allTasks().find(t=>t.id===id); }
+function phDone(ph) { return ph.sections.flatMap(s=>s.tasks).filter(t=>state.checked[t.id]).length; }
+function phTotal(ph) { return ph.sections.flatMap(s=>s.tasks).length; }
+function totalDone() { return allTasks().filter(t=>state.checked[t.id]).length; }
+function totalAll() { return allTasks().length; }
+function getMbr(id) { return state.members.find(m=>m.id===id); }
+function initials(name) {
+  const p=name.trim().split(/\s+/);
+  return p.length===1 ? p[0].substring(0,2).toUpperCase() : (p[0][0]+p[p.length-1][0]).toUpperCase();
+}
+function activePh() {
+  for(let i=0;i<PHASES.length;i++) { if(PHASES[i].sections.flatMap(s=>s.tasks).some(t=>!state.checked[t.id])) return i; }
+  return PHASES.length-1;
+}
+
+/* ââ SUPABASE ââ */
+async function loadState() {
+  const {data,error} = await sb.from('gtm_state').select('data').eq('id',1).single();
+  if(error){setSS('error','Load failed');return;}
+  if(data&&data.data&&Object.keys(data.data).length>0) state={...state,...data.data};
+}
+function schedSave() { clearTimeout(_timer); _timer=setTimeout(persist,800); }
+async function persist() {
+  setSS('syncing','Savingâ¦'); _suppress=true;
+  const {error}=await sb.from('gtm_state').update({data:state,updated_at:new Date().toISOString()}).eq('id',1);
+  if(error){setSS('error','Save failed');_suppress=false;return;}
+  setSS('synced','â Synced'); setTimeout(()=>setSS('synced','â Live'),1500);
+}
+function setupRT() {
+  sb.channel('gtm_ch').on('postgres_changes',{event:'UPDATE',schema:'public',table:'gtm_state',filter:'id=eq.1'},(p)=>{
+    if(_suppress){_suppress=false;return;}
+    const r=p.new.data;
+    if(r&&typeof r==='object'){state={...state,...r};renderAll();setSS('updated','â Updated');setTimeout(()=>setSS('synced','â Live'),2000);}
+  }).subscribe(s=>{if(s==='SUBSCRIBED')setSS('synced','â Live');});
+}
+function setSS(cls,txt) {
+  const el=document.getElementById('sync-status');
+  const dot=el.querySelector('.sync-dot');
+  el.className=cls; document.getElementById('sync-label').textContent=txt;
+  dot.className='sync-dot'+(cls==='syncing'?' pulse':'');
+}
+
+/* ââ RENDER ââ */
+function renderAll() {
+  renderKpis(); renderFocus(); renderFilterBar(); renderPhases();
+  document.getElementById('ovr-pct').textContent = totalAll()?Math.round(totalDone()/totalAll()*100):0;
+}
+
+function renderKpis() {
+  document.getElementById('kpi-section').innerHTML = KPIS.map(k=>`
+    <div class="kpi-tile">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value"><input type="number" min="0" value="${state.kpis[k.id]||0}" data-kpi="${k.id}" /></div>
+      <div class="kpi-target">${k.target}</div>
+    </div>`).join('');
+  document.querySelectorAll('[data-kpi]').forEach(inp=>inp.addEventListener('change',e=>{
+    state.kpis[e.target.dataset.kpi]=Number(e.target.value); schedSave();
+  }));
+}
+
+function renderFocus() {
+  const ph=PHASES[activePh()];
+  document.getElementById('focus-section').innerHTML=`
+    <div class="focus-eyebrow">ð¯ CURRENT FOCUS</div>
+    <div class="focus-title">Phase ${ph.num} â ${ph.title}</div>
+    <div class="focus-desc">${ph.goal}</div>
+    <div class="focus-tags">${ph.tags.map(t=>`<span class="focus-tag">${t}</span>`).join('')}</div>`;
+}
+
+function renderFilterBar() {
+  document.getElementById('member-chips').innerHTML = state.members.map(m=>`
+    <button class="filter-chip ${activeFilter===m.id?'active':''}" data-fid="${m.id}">
+      <span class="chip-avatar" style="background:${m.color}">${initials(m.name)}</span>${m.name}
+    </button>`).join('');
+  document.querySelectorAll('[data-fid]').forEach(b=>b.onclick=()=>{
+    activeFilter=b.dataset.fid;
+    document.querySelectorAll('[data-fid]').forEach(x=>x.classList.toggle('active',x.dataset.fid===activeFilter));
+    applyFilter();
+  });
+}
+
+function applyFilter() {
+  document.querySelectorAll('.task-row').forEach(row=>{
+    if(activeFilter==='all'){row.classList.remove('hidden-by-filter');return;}
+    row.classList.toggle('hidden-by-filter', state.assignments[row.dataset.tid]!==activeFilter);
+  });
+}
+
+function renderPhases() {
+  document.getElementById('phases-container').innerHTML = PHASES.map(ph=>{
+    const done=phDone(ph), total=phTotal(ph), pct=total?Math.round(done/total*100):0;
+    const open=state.collapsed[ph.id]!==false;
+    const secs=ph.sections.map(sec=>`
+      <div class="phase-section">
+        <div class="section-header"><span>${sec.t}</span><span class="section-count">${sec.tasks.filter(t=>state.checked[t.id]).length}/${sec.tasks.length}</span></div>
+        ${sec.tasks.map(task=>taskRowHtml(task)).join('')}
+      </div>`).join('');
+    return `
+    <div class="phase-card pc-${ph.id}" id="pc-${ph.id}">
+      <div class="phase-header" data-pid="${ph.id}">
+        <div class="ph-left">
+          <div class="phase-num">PHASE ${ph.num}</div>
+          <div class="phase-title">${ph.title}</div>
+          <div class="phase-timeline">${ph.timeline}</div>
+          <div class="phase-goal">${ph.goal}</div>
+        </div>
+        <div class="ph-right">
+          <div><div class="phase-prog-count">${done}/${total}</div><div class="phase-prog-label">tasks done</div></div>
+          <div class="phase-chevron ${open?'open':''}">â¼</div>
+        </div>
+      </div>
+      <div class="phase-progress-bar"><div class="phase-progress-fill" style="width:${pct}%"></div></div>
+      <div class="phase-body ${open?'open':''}">${secs}</div>
+    </div>`;
+  }).join('');
+
+  // Phase toggle
+  document.querySelectorAll('.phase-header[data-pid]').forEach(hdr=>hdr.addEventListener('click',e=>{
+    if(e.target.closest('.task-row')) return;
+    const pid=hdr.dataset.pid;
+    const body=hdr.parentElement.querySelector('.phase-body');
+    const chev=hdr.querySelector('.phase-chevron');
+    const isOpen=body.classList.toggle('open');
+    chev.classList.toggle('open',isOpen);
+    state.collapsed[pid]=isOpen; schedSave();
+  }));
+
+  // Checkboxes
+  document.querySelectorAll('.task-checkbox').forEach(chk=>chk.addEventListener('change',e=>{
+    const id=e.target.dataset.tid;
+    state.checked[id]=e.target.checked;
+    const row=e.target.closest('.task-row');
+    row.classList.toggle('completed',e.target.checked);
+    updatePhCard(row.closest('.phase-card'));
+    document.getElementById('ovr-pct').textContent=Math.round(totalDone()/totalAll()*100);
+    renderFocus(); schedSave();
+  }));
+
+  // Assign buttons
+  document.querySelectorAll('.assign-wrap').forEach(wrap=>wrap.addEventListener('click',e=>{
+    e.stopPropagation();
+    const tid=wrap.dataset.tid;
+    if(openDropTask===tid){closeDrop();return;}
+    closeDrop(); openDropTask=tid; showDrop(wrap,tid);
+  }));
+
+  document.addEventListener('click',()=>closeDrop());
+  applyFilter();
+}
+
+function taskRowHtml(task) {
+  const chk=state.checked[task.id];
+  const mid=state.assignments[task.id];
+  const m=mid?getMbr(mid):null;
+  const av = m
+    ? `<div class="assign-avatar" style="background:${m.color};border-color:${m.color}" title="${m.name}">${initials(m.name)}</div>`
+    : `<div class="assign-avatar unassigned" title="Assign">+</div>`;
+  const assignBtn = state.members.length
+    ? `<div class="assign-wrap" data-tid="${task.id}" title="Assign to team member">${av}</div>` : '';
+  return `<div class="task-row ${chk?'completed':''}" data-tid="${task.id}">
+    <input type="checkbox" class="task-checkbox" data-tid="${task.id}" ${chk?'checked':''} />
+    <span class="task-text">${task.t}</span>
+    ${assignBtn}
+  </div>`;
+}
+
+function showDrop(wrap,tid) {
+  const mid=state.assignments[tid];
+  const d=document.createElement('div');
+  d.className='assign-dropdown'; d.id='adrop';
+  d.innerHTML = state.members.map(m=>`
+    <div class="assign-option" data-mid="${m.id}">
+      <span class="ao-avatar" style="background:${m.color}">${initials(m.name)}</span>${m.name}
+    </div>`).join('')
+    + (mid?`<div class="assign-divider"></div><div class="assign-option" data-mid="__none"><span class="ao-avatar" style="background:#e2e8f0;color:#64748b">â</span>Unassign</div>`:'');
+  d.querySelectorAll('.assign-option').forEach(opt=>opt.addEventListener('click',e=>{
+    e.stopPropagation();
+    const mid2=opt.dataset.mid;
+    if(mid2==='__none') delete state.assignments[tid];
+    else state.assignments[tid]=mid2;
+    closeDrop();
+    // Patch just the assign button of this row
+    const row=document.querySelector(`.task-row[data-tid="${tid}"]`);
+    if(row){
+      const task=getTask(tid);
+      if(task){
+        const newMid=state.assignments[tid];
+        const m2=newMid?getMbr(newMid):null;
+        const newAv = m2
+          ? `<div class="assign-avatar" style="background:${m2.color};border-color:${m2.color}" title="${m2.name}">${initials(m2.name)}</div>`
+          : `<div class="assign-avatar unassigned" title="Assign">+</div>`;
+        let aw=row.querySelector('.assign-wrap');
+        if(!aw&&state.members.length){
+          aw=document.createElement('div'); aw.className='assign-wrap'; aw.dataset.tid=tid; row.appendChild(aw);
+          aw.addEventListener('click',ev=>{ev.stopPropagation();if(openDropTask===tid){closeDrop();return;}closeDrop();openDropTask=tid;showDrop(aw,tid);});
+        }
+        if(aw) aw.innerHTML=newAv;
+      }
+    }
+    applyFilter(); schedSave();
+  }));
+  wrap.style.position='relative'; wrap.appendChild(d);
+}
+
+function closeDrop() {
+  const d=document.getElementById('adrop'); if(d) d.remove(); openDropTask=null;
+}
+
+function updatePhCard(card) {
+  if(!card) return;
+  const pid=card.id.replace('pc-','');
+  const ph=PHASES.find(p=>p.id===pid); if(!ph) return;
+  const done=phDone(ph), total=phTotal(ph), pct=total?Math.round(done/total*100):0;
+  const pc=card.querySelector('.phase-prog-count'); if(pc) pc.textContent=`${done}/${total}`;
+  const pf=card.querySelector('.phase-progress-fill'); if(pf) pf.style.width=pct+'%';
+  card.querySelectorAll('.phase-section').forEach(sec=>{
+    const sc=sec.querySelector('.section-count');
+    if(sc){const d2=sec.querySelectorAll('.task-row.completed').length,t2=sec.querySelectorAll('.task-row').length;sc.textContent=`${d2}/${t2}`;}
+  });
+}
+
+/* ââ MEMBER MODAL ââ */
+function renderMList() {
+  const el=document.getElementById('m-list');
+  el.innerHTML=state.members.length
+    ? state.members.map(m=>`
+      <div class="m-item">
+        <div class="m-av" style="background:${m.color}">${initials(m.name)}</div>
+        <div class="m-name">${m.name}</div>
+        <button class="m-rm" data-rmid="${m.id}" title="Remove">Ã</button>
+      </div>`).join('')
+    : '<div class="empty-m">No team members yet. Add one below.</div>';
+  el.querySelectorAll('[data-rmid]').forEach(btn=>btn.onclick=()=>{
+    const id=btn.dataset.rmid;
+    state.members=state.members.filter(m=>m.id!==id);
+    Object.keys(state.assignments).forEach(tid=>{if(state.assignments[tid]===id)delete state.assignments[tid];});
+    if(activeFilter===id){activeFilter='all';document.querySelectorAll('[data-fid]').forEach(b=>b.classList.toggle('active',b.dataset.fid==='all'));}
+    renderAll(); schedSave();
+  });
+}
+
+function renderSwatches() {
+  document.getElementById('swatches').innerHTML=PALETTE.map(c=>`
+    <div class="swatch ${c===selColor?'sel':''}" style="background:${c}" data-c="${c}"></div>`).join('');
+  document.querySelectorAll('.swatch').forEach(s=>s.onclick=()=>{selColor=s.dataset.c;renderSwatches();});
+}
+
+/* ââ EVENTS ââ */
+document.getElementById('team-btn').onclick=()=>{
+  document.getElementById('team-overlay').classList.add('open');
+  renderMList(); renderSwatches();
+};
+document.getElementById('modal-close').onclick=()=>document.getElementById('team-overlay').classList.remove('open');
+document.getElementById('team-overlay').onclick=e=>{if(e.target===e.currentTarget)document.getElementById('team-overlay').classList.remove('open');};
+
+document.getElementById('add-btn').onclick=()=>{
+  const inp=document.getElementById('new-name'); const name=inp.value.trim(); if(!name) return;
+  state.members.push({id:'m'+Date.now(),name,color:selColor});
+  inp.value=''; selColor=PALETTE[state.members.length%PALETTE.length];
+  renderAll(); renderMList(); renderSwatches(); schedSave();
+};
+document.getElementById('new-name').onkeydown=e=>{if(e.key==='Enter')document.getElementById('add-btn').click();};
+
+document.getElementById('reset-btn').onclick=()=>{
+  if(!confirm('Reset all task progress? Members, assignments, and KPIs will be kept.')) return;
+  state.checked={}; state.collapsed={};
+  PHASES.forEach((ph,i)=>state.collapsed[ph.id]=i===0);
+  renderAll(); schedSave();
+};
+document.getElementById('save-btn').onclick=persist;
+
+/* ââ INIT ââ */
+(async function() {
+  setSS('syncing','Connectingâ¦');
+  PHASES.forEach((ph,i)=>{if(!(ph.id in state.collapsed))state.collapsed[ph.id]=i===0;});
+  await loadState();
+  PHASES.forEach((ph,i)=>{if(!(ph.id in state.collapsed))state.collapsed[ph.id]=i===0;});
+  renderAll();
+  const ov=document.getElementById('loading-overlay');
+  ov.classList.add('hidden'); setTimeout(()=>ov.style.display='none',500);
+  setupRT();
+})();
+</script>
+</body>
+</html>
