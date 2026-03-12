@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Declaration AI â GTM Tracker</title>
+  <title>Declaration AI — GTM Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -174,21 +174,21 @@
 
 <div id="loading-overlay">
   <div class="loading-spinner"></div>
-  <div class="loading-text">Loading shared progressâ¦</div>
+  <div class="loading-text">Loading shared progress…</div>
 </div>
 
 <div id="team-overlay">
   <div class="modal-box">
     <div class="modal-hd">
-      <div class="modal-hd-title">ð¥ Team Members</div>
-      <button class="modal-close" id="modal-close">Ã</button>
+      <div class="modal-hd-title">👥 Team Members</div>
+      <button class="modal-close" id="modal-close">×</button>
     </div>
     <div class="modal-bd">
       <div class="m-list" id="m-list"></div>
       <div class="add-form">
         <div class="add-form-title">Add Team Member</div>
         <div class="add-row">
-          <input type="text" class="add-input" id="new-name" placeholder="Nameâ¦" maxlength="24" />
+          <input type="text" class="add-input" id="new-name" placeholder="Name…" maxlength="24" />
           <button class="add-btn" id="add-btn">Add</button>
         </div>
         <div class="swatches" id="swatches"></div>
@@ -199,14 +199,14 @@
 
 <header>
   <div class="header-left">
-    <h1>Declaration AI â GTM Tracker</h1>
-    <p>Latvia &amp; EU Expansion Â· 2026 Â· Baltic AI / LETT 2000 SIA</p>
+    <h1>Declaration AI — GTM Tracker</h1>
+    <p>Latvia &amp; EU Expansion · 2026 · Baltic AI / LETT 2000 SIA</p>
   </div>
   <div class="header-right">
-    <button class="team-btn" id="team-btn">ð¥ Team</button>
+    <button class="team-btn" id="team-btn">👥 Team</button>
     <div id="sync-status" class="syncing">
       <div class="sync-dot pulse"></div>
-      <span id="sync-label">Connectingâ¦</span>
+      <span id="sync-label">Connecting…</span>
     </div>
     <div class="progress-badge"><span id="ovr-pct">0</span>% Overall</div>
   </div>
@@ -223,273 +223,273 @@
 
 <div id="action-bar">
   <button class="btn-reset" id="reset-btn">Reset All</button>
-  <button class="btn-save" id="save-btn">ð¾ Save Progress</button>
+  <button class="btn-save" id="save-btn">💾 Save Progress</button>
 </div>
 
 <div id="phases-container"></div>
 
 <script>
-/* ââ SUPABASE ââ */
+/* ── SUPABASE ── */
 const SUPABASE_URL = "https://nrdtiztxrbkhmvrqvojd.supabase.co";
 const SUPABASE_KEY = "sb_publishable__GheKX72SoYJyWibDxrCtA_zAquucq_";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ââ PALETTE ââ */
+/* ── PALETTE ── */
 const PALETTE = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#64748b'];
 let selColor = PALETTE[0];
 let activeFilter = 'all';
 let openDropTask = null;
 
-/* ââ DATA ââ */
+/* ── DATA ── */
 const KPIS = [
-  { id:'kpi_cust', label:'Paying Customers', icon:'ð¥', target:'â 20 target' },
-  { id:'kpi_mrr',  label:'Monthly MRR (â¬)',  icon:'ð¶', target:'â â¬15K target' },
-  { id:'kpi_ctry', label:'Countries Active', icon:'ð', target:'â 5 countries' },
-  { id:'kpi_cap',  label:'Capital Raised (â¬)',icon:'ð', target:'â â¬500K target' },
+  { id:'kpi_cust', label:'Paying Customers', icon:'👥', target:'→ 20 target' },
+  { id:'kpi_mrr',  label:'Monthly MRR (€)',  icon:'💶', target:'→ €15K target' },
+  { id:'kpi_ctry', label:'Countries Active', icon:'🌍', target:'→ 5 countries' },
+  { id:'kpi_cap',  label:'Capital Raised (€)',icon:'🚀', target:'→ €500K target' },
 ];
 
 const PHASES = [
   { id:'p1', num:'01', color:'#3b82f6',
     title:'Foundation & Demo Readiness',
-    timeline:'Months 1â2 Â· MarâApr 2026',
+    timeline:'Months 1–2 · Mar–Apr 2026',
     goal:'Polish Declaration AI for external demos, build the public landing page, define pricing, and compile a 30+ target list of Latvian customs brokers. Nothing leaves LETT 2000 until the product is demo-ready.',
     tags:['Product audit','Landing page','Pricing structure','30+ broker target list'],
     sections:[
-      { t:'WEEK 1â2 â PRODUCT POLISH', tasks:[
-        { id:'p1-audit',    t:'Conduct full audit across all 10 modules â test with real LETT 2000 declarations, document any gaps or edge cases in the workflow' },
+      { t:'WEEK 1–2 — PRODUCT POLISH', tasks:[
+        { id:'p1-audit',    t:'Conduct full audit across all 10 modules — test with real LETT 2000 declarations, document any gaps or edge cases in the workflow' },
         { id:'p1-asian',    t:'Fix Asian-language product name handling: ensure Latvian translations are accurate for Japanese/Chinese imports (Yaskawa servo motors, cables, etc.)' },
-        { id:'p1-upload',   t:'Improve multi-document upload UX â add progress indicators, clear file status labels, reduce friction for first-time external users' },
-        { id:'p1-errors',   t:'Add proper error messages and loading states throughout the app â critical for demos and paid customers who cannot tolerate silent failures' },
-        { id:'p1-conflict', t:'Polish conflict resolution UI â make it crystal clear what the user must decide and why, always show source document labels (INVOICE vs AWB vs PACKING_LIST)' },
+        { id:'p1-upload',   t:'Improve multi-document upload UX — add progress indicators, clear file status labels, reduce friction for first-time external users' },
+        { id:'p1-errors',   t:'Add proper error messages and loading states throughout the app — critical for demos and paid customers who cannot tolerate silent failures' },
+        { id:'p1-conflict', t:'Polish conflict resolution UI — make it crystal clear what the user must decide and why, always show source document labels (INVOICE vs AWB vs PACKING_LIST)' },
         { id:'p1-demoacc',  t:'Set up a clean demo account with 3 pre-loaded sample declarations using anonymised LETT 2000 data: one import, one export, one complex multi-document shipment' },
       ]},
-      { t:'WEEK 2â4 â LANDING PAGE BUILD', tasks:[
-        { id:'p1-domain',   t:'Register declarationai.eu (or declarationai.com) â connect DNS to Vercel, set up SSL, create professional email (hello@declarationai.eu)' },
+      { t:'WEEK 2–4 — LANDING PAGE BUILD', tasks:[
+        { id:'p1-domain',   t:'Register declarationai.eu (or declarationai.com) — connect DNS to Vercel, set up SSL, create professional email (hello@declarationai.eu)' },
         { id:'p1-lpcopy',   t:'Write landing page copy: hero headline, value proposition, 6 feature bullets, workflow section, social proof (473+ declarations, live since Sep 2025, LETT 2000 quote)' },
-        { id:'p1-lpbuild',  t:'Design and build the public landing page â sections: Hero, Features, How It Works (workflow), Social Proof, Pricing Teaser, Demo CTA. Match Declaration AI brand: blue primary, white background' },
-        { id:'p1-demofrm',  t:'Add Request a Demo CTA form with email capture â route submissions to Declaration AI Leads module + send immediate email notification to team' },
-        { id:'p1-video',    t:'Record a 2â3 minute product walkthrough video: document upload â AI extraction â TARIC classification â conflict resolution â XML download for EDS submission' },
-        { id:'p1-ga',       t:'Set up Google Analytics 4 and Google Search Console â track demo form submissions as conversion events, monitor traffic sources from day one' },
+        { id:'p1-lpbuild',  t:'Design and build the public landing page — sections: Hero, Features, How It Works (workflow), Social Proof, Pricing Teaser, Demo CTA. Match Declaration AI brand: blue primary, white background' },
+        { id:'p1-demofrm',  t:'Add Request a Demo CTA form with email capture — route submissions to Declaration AI Leads module + send immediate email notification to team' },
+        { id:'p1-video',    t:'Record a 2–3 minute product walkthrough video: document upload → AI extraction → TARIC classification → conflict resolution → XML download for EDS submission' },
+        { id:'p1-ga',       t:'Set up Google Analytics 4 and Google Search Console — track demo form submissions as conversion events, monitor traffic sources from day one' },
       ]},
-      { t:'WEEK 3â4 â SALES MATERIALS', tasks:[
-        { id:'p1-deck',     t:'Create 10-slide demo pitch deck: Problem â Declaration AI Solution â Key Features (5) â Live Workflow Demo â LETT 2000 Results â Pricing â Pilot Offer â Next Steps' },
-        { id:'p1-pricing',  t:'Define and publish pricing tiers: Starter â¬500/mo (1 user, 50 decl/mo), Professional â¬1,200/mo (5 users, unlimited), Enterprise (custom) â publish on landing page pricing section' },
-        { id:'p1-roi',      t:'Build 1-page ROI calculator: inputs = team size + declarations per month â outputs = hours saved per week + â¬â¬ cost reduction. Use in demo calls to personalise value' },
+      { t:'WEEK 3–4 — SALES MATERIALS', tasks:[
+        { id:'p1-deck',     t:'Create 10-slide demo pitch deck: Problem → Declaration AI Solution → Key Features (5) → Live Workflow Demo → LETT 2000 Results → Pricing → Pilot Offer → Next Steps' },
+        { id:'p1-pricing',  t:'Define and publish pricing tiers: Starter €500/mo (1 user, 50 decl/mo), Professional €1,200/mo (5 users, unlimited), Enterprise (custom) — publish on landing page pricing section' },
+        { id:'p1-roi',      t:'Build 1-page ROI calculator: inputs = team size + declarations per month → outputs = hours saved per week + €€ cost reduction. Use in demo calls to personalise value' },
         { id:'p1-pilot',    t:'Draft pilot agreement template: 30-day free trial terms, light SLA, data privacy and NDA clauses, what happens at the end of trial (pricing, exit)' },
         { id:'p1-onepage',  t:'Create 1-page product overview PDF for cold email attachments: problem, solution, 3 differentiators vs manual process, LETT 2000 quote, contact info' },
       ]},
-      { t:'WEEK 3â4 â TARGET LIST BUILDING', tasks:[
-        { id:'p1-research',  t:'Research all licensed customs agents and brokers in Latvia via the CSDD register and Latvian Customs Authority database â list every authorised firm' },
+      { t:'WEEK 3–4 — TARGET LIST BUILDING', tasks:[
+        { id:'p1-research',  t:'Research all licensed customs agents and brokers in Latvia via the CSDD register and Latvian Customs Authority database — list every authorised firm' },
         { id:'p1-targlist',  t:'Build outreach spreadsheet (30+ entries): company name, contact person name, email, LinkedIn URL, estimated declaration volume, primary trade routes handled' },
         { id:'p1-rank',      t:'Rank targets by: (1) air freight volume at Riga Airport LV000240, (2) Asian import routes with translation complexity, (3) company size and team count' },
-        { id:'p1-warmintro', t:'Ask LETT 2000 team for warm introductions to peer brokers â warm referrals convert 5â10Ã better than cold outreach and close faster' },
+        { id:'p1-warmintro', t:'Ask LETT 2000 team for warm introductions to peer brokers — warm referrals convert 5–10× better than cold outreach and close faster' },
       ]},
     ]
   },
   { id:'p2', num:'02', color:'#10b981',
     title:'Latvian Market Outreach & Pilots',
-    timeline:'Months 2â3 Â· AprâMay 2026',
-    goal:'Run structured outreach to 30+ brokers, book at least 8 demo calls, and sign 3â5 pilot agreements. Focus on brokers handling Asian import routes â they suffer most from document variety and Latvian translation complexity.',
-    tags:['Cold email campaign','8+ demo calls','3â5 pilot agreements','30-day onboarding support'],
+    timeline:'Months 2–3 · Apr–May 2026',
+    goal:'Run structured outreach to 30+ brokers, book at least 8 demo calls, and sign 3–5 pilot agreements. Focus on brokers handling Asian import routes — they suffer most from document variety and Latvian translation complexity.',
+    tags:['Cold email campaign','8+ demo calls','3–5 pilot agreements','30-day onboarding support'],
     sections:[
-      { t:'WEEK 5â6 â OUTREACH CAMPAIGN', tasks:[
-        { id:'p2-emailseq', t:'Send personalised cold email sequence to 30 target brokers â 3-email cadence: (1) intro + 1 specific insight about their routes, (2) demo offer with ROI stats, (3) final follow-up after 5 days' },
-        { id:'p2-linkedin', t:'Connect with decision-makers on LinkedIn (operations directors, customs managers) â personalised InMails referencing specific trade routes or cargo types they handle' },
-        { id:'p2-assoc',    t:'Reach out to Latvian Customs Brokers Association â request an introduction email to members or a speaking slot at their next quarterly meeting' },
-        { id:'p2-events',   t:'Attend Riga logistics and trade events â bring demo device, collect business cards, aim for 10+ meaningful face-to-face conversations with potential buyers' },
-        { id:'p2-warmcall', t:'Phone-call all warm intro leads from LETT 2000 network within 48 hours â these are highest priority, try to book a demo during the first call itself' },
+      { t:'WEEK 5–6 — OUTREACH CAMPAIGN', tasks:[
+        { id:'p2-emailseq', t:'Send personalised cold email sequence to 30 target brokers — 3-email cadence: (1) intro + 1 specific insight about their routes, (2) demo offer with ROI stats, (3) final follow-up after 5 days' },
+        { id:'p2-linkedin', t:'Connect with decision-makers on LinkedIn (operations directors, customs managers) — personalised InMails referencing specific trade routes or cargo types they handle' },
+        { id:'p2-assoc',    t:'Reach out to Latvian Customs Brokers Association — request an introduction email to members or a speaking slot at their next quarterly meeting' },
+        { id:'p2-events',   t:'Attend Riga logistics and trade events — bring demo device, collect business cards, aim for 10+ meaningful face-to-face conversations with potential buyers' },
+        { id:'p2-warmcall', t:'Phone-call all warm intro leads from LETT 2000 network within 48 hours — these are highest priority, try to book a demo during the first call itself' },
       ]},
-      { t:'WEEK 7â8 â DEMO CALLS', tasks:[
-        { id:'p2-bookdemo', t:'Book minimum 8 demo calls from outreach responses â video call + screen share, 30â45 minutes, calendar invite with prep materials attached' },
-        { id:'p2-rundemo',  t:'Run demos: show Asian-import workflow (Yaskawa motors as example) â TARIC classification with AI explanation â conflict resolution â POA lookup â XML download. Use pre-loaded demo account' },
+      { t:'WEEK 7–8 — DEMO CALLS', tasks:[
+        { id:'p2-bookdemo', t:'Book minimum 8 demo calls from outreach responses — video call + screen share, 30–45 minutes, calendar invite with prep materials attached' },
+        { id:'p2-rundemo',  t:'Run demos: show Asian-import workflow (Yaskawa motors as example) → TARIC classification with AI explanation → conflict resolution → POA lookup → XML download. Use pre-loaded demo account' },
         { id:'p2-feedback', t:'Collect structured feedback after every demo: biggest current pain, what impressed them most, what is missing from the product, reaction to pricing tier' },
         { id:'p2-fu24h',    t:'Send personalised follow-up email within 24 hours: recap, pricing document, pilot agreement offer. Speed and personalisation signal you are serious' },
-        { id:'p2-objdoc',   t:'Document every objection raised across all demo calls and prepare rebuttal scripts â build institutional sales knowledge for future team members or hires' },
+        { id:'p2-objdoc',   t:'Document every objection raised across all demo calls and prepare rebuttal scripts — build institutional sales knowledge for future team members or hires' },
       ]},
-      { t:'WEEK 8â10 â PILOT ONBOARDING', tasks:[
-        { id:'p2-pilotsign', t:'Sign pilot agreements with 3â5 brokers â 30-day free trial with onboarding support included. Counter-sign within 24 hours, do not let enthusiasm cool' },
+      { t:'WEEK 8–10 — PILOT ONBOARDING', tasks:[
+        { id:'p2-pilotsign', t:'Sign pilot agreements with 3–5 brokers — 30-day free trial with onboarding support included. Counter-sign within 24 hours, do not let enthusiasm cool' },
         { id:'p2-accsetup',  t:'Set up pilot accounts: create user profiles, configure USER/ADMIN roles, import any existing POA documents from the broker into the platform' },
         { id:'p2-training',  t:'Run 1-hour onboarding session per pilot via video call: live declaration walkthrough, TARIC search and memory demo, POA management, XML download flow' },
-        { id:'p2-firstdecl', t:'Join pilot on video call for their first 2â3 real declarations on the platform â catch friction points in real-time and fix within 24 hours' },
-        { id:'p2-checkins',  t:'Set up weekly 15-min check-in calls with each pilot during the 30-day trial â track: declarations processed, issues found, satisfaction score (1â10)' },
+        { id:'p2-firstdecl', t:'Join pilot on video call for their first 2–3 real declarations on the platform — catch friction points in real-time and fix within 24 hours' },
+        { id:'p2-checkins',  t:'Set up weekly 15-min check-in calls with each pilot during the 30-day trial — track: declarations processed, issues found, satisfaction score (1–10)' },
         { id:'p2-metrics',   t:'Track pilot metrics in a weekly dashboard: declarations processed, average time per declaration vs their old process, TARIC acceptance rate, support tickets' },
       ]},
     ]
   },
   { id:'p3', num:'03', color:'#f59e0b',
     title:'First Revenue & Customer Success',
-    timeline:'Months 3â4 Â· MayâJun 2026',
-    goal:'Convert 2â3 pilots to paid subscriptions, hit â¬2K+ MRR, get a publishable LETT 2000 case study and written testimonials. These are the minimum proof-points required before approaching investors.',
-    tags:['Pilot-to-paid conversion','â¬2K MRR milestone','Case study','Written testimonials'],
+    timeline:'Months 3–4 · May–Jun 2026',
+    goal:'Convert 2–3 pilots to paid subscriptions, hit €2K+ MRR, get a publishable LETT 2000 case study and written testimonials. These are the minimum proof-points required before approaching investors.',
+    tags:['Pilot-to-paid conversion','€2K MRR milestone','Case study','Written testimonials'],
     sections:[
       { t:'PILOT-TO-PAID CONVERSION', tasks:[
-        { id:'p3-data',    t:'Analyse 30-day pilot data per customer: declarations processed, time saved vs manual process, errors caught â build conversion pitch using their own numbers, not generic claims' },
-        { id:'p3-fixes',   t:'Address top 3 feedback items from each pilot before making the conversion ask â show you respond fast and treat them as a partner, not just a user' },
+        { id:'p3-data',    t:'Analyse 30-day pilot data per customer: declarations processed, time saved vs manual process, errors caught — build conversion pitch using their own numbers, not generic claims' },
+        { id:'p3-fixes',   t:'Address top 3 feedback items from each pilot before making the conversion ask — show you respond fast and treat them as a partner, not just a user' },
         { id:'p3-convmtg', t:'Run conversion meeting with each pilot: open with their personal ROI data, walk through subscription options, handle objections with prepared rebuttal scripts' },
-        { id:'p3-contract',t:'Sign minimum 2 paid subscription contracts at â¬500â1,500/month based on team size and declaration volume â get first invoices sent within the same week' },
+        { id:'p3-contract',t:'Sign minimum 2 paid subscription contracts at €500–1,500/month based on team size and declaration volume — get first invoices sent within the same week' },
         { id:'p3-payment', t:'Set up payment infrastructure: Stripe recurring billing or SEPA bank transfer + proper invoicing, subscription tracking, automated renewal reminders' },
-        { id:'p3-mrr2k',   t:'ð¯ Hit â¬2,000 MRR milestone â document this date and share internally. This is the minimum credibility threshold required before approaching investors' },
+        { id:'p3-mrr2k',   t:'🎯 Hit €2,000 MRR milestone — document this date and share internally. This is the minimum credibility threshold required before approaching investors' },
       ]},
       { t:'CUSTOMER SUCCESS INFRASTRUCTURE', tasks:[
         { id:'p3-health',  t:'Build a simple customer health scorecard: weekly declarations processed, percentage of modules adopted, open support tickets, NPS or satisfaction score' },
-        { id:'p3-docs',    t:'Write basic product documentation: getting started guide, module reference for each of the 10 features, FAQ for common errors â host on Notion or a simple docs site' },
+        { id:'p3-docs',    t:'Write basic product documentation: getting started guide, module reference for each of the 10 features, FAQ for common errors — host on Notion or a simple docs site' },
         { id:'p3-support', t:'Set up support flow: dedicated email address per customer or shared Slack channel, response SLA < 4 business hours, escalation path for critical bugs' },
-        { id:'p3-review',  t:'Run first monthly business review with each paying customer â present their usage data, collect structured feedback, share the product roadmap for their input' },
+        { id:'p3-review',  t:'Run first monthly business review with each paying customer — present their usage data, collect structured feedback, share the product roadmap for their input' },
         { id:'p3-expand',  t:'Identify expansion opportunities within each customer: additional user seats, adopting unused modules (e.g. Product Research), white-glove onboarding for new team members' },
       ]},
       { t:'SOCIAL PROOF & CASE STUDIES', tasks:[
-        { id:'p3-letcase',  t:'Write LETT 2000 case study: time savings (X hours/week â Y minutes per declaration since Sep 2025), error reduction, declarations processed â get written sign-off for public use' },
-        { id:'p3-testims',  t:'Collect 2â3 written testimonials from pilot and paying customers â 2 sentences minimum on specific value received. Name, job title, company â no anonymous quotes' },
-        { id:'p3-casepdf',  t:'Design the case study as a shareable PDF and a landing page section â use in sales process, investor pitch deck, and LinkedIn content posts' },
-        { id:'p3-pr',       t:'Pitch an article to Baltic trade and logistics publications: lvportals.lv, Baltic Logistics Today, FIATA member publications â AI in EU customs is a timely editorial angle' },
+        { id:'p3-letcase',  t:'Write LETT 2000 case study: time savings (X hours/week → Y minutes per declaration since Sep 2025), error reduction, declarations processed — get written sign-off for public use' },
+        { id:'p3-testims',  t:'Collect 2–3 written testimonials from pilot and paying customers — 2 sentences minimum on specific value received. Name, job title, company — no anonymous quotes' },
+        { id:'p3-casepdf',  t:'Design the case study as a shareable PDF and a landing page section — use in sales process, investor pitch deck, and LinkedIn content posts' },
+        { id:'p3-pr',       t:'Pitch an article to Baltic trade and logistics publications: lvportals.lv, Baltic Logistics Today, FIATA member publications — AI in EU customs is a timely editorial angle' },
       ]},
     ]
   },
   { id:'p4', num:'04', color:'#8b5cf6',
     title:'Landing Page & Inbound Marketing',
-    timeline:'Months 3â5 Â· MayâJul 2026',
+    timeline:'Months 3–5 · May–Jul 2026',
     goal:'Launch the public Declaration AI website, establish a LinkedIn presence, and build an inbound pipeline so growth is not solely dependent on outbound cold calls and emails.',
     tags:['Launch declarationai.eu','LinkedIn company page','2 blog posts','Demo booking funnel'],
     sections:[
       { t:'WEBSITE & BRAND LAUNCH', tasks:[
         { id:'p4-lplaunch', t:'Launch declarationai.eu publicly with all sections live: hero, feature breakdown, workflow walkthrough, pricing page, LETT 2000 case study, testimonials, demo booking CTA' },
-        { id:'p4-linkedin', t:'Create Declaration AI LinkedIn Company Page â professional logo, banner image, product description, website link, weekly posting cadence plan' },
-        { id:'p4-personal', t:'Update founding team LinkedIn profiles to reflect Declaration AI roles â begin posting 1Ã per week from personal accounts (significantly more reach than company page at this stage)' },
+        { id:'p4-linkedin', t:'Create Declaration AI LinkedIn Company Page — professional logo, banner image, product description, website link, weekly posting cadence plan' },
+        { id:'p4-personal', t:'Update founding team LinkedIn profiles to reflect Declaration AI roles — begin posting 1× per week from personal accounts (significantly more reach than company page at this stage)' },
         { id:'p4-dirs',     t:'Submit Declaration AI to relevant directories: G2, Capterra, Product Hunt (EU launch), EU-Startups database, BuiltInLatvia or equivalent Baltic startup registries' },
-        { id:'p4-adstest',  t:'Run â¬300 test Google Ads campaign on "customs declaration software EU", "TARIC classification tool", "EU customs broker software" â measure CPC and lead quality before scaling' },
+        { id:'p4-adstest',  t:'Run €300 test Google Ads campaign on "customs declaration software EU", "TARIC classification tool", "EU customs broker software" — measure CPC and lead quality before scaling' },
       ]},
       { t:'CONTENT MARKETING', tasks:[
-        { id:'p4-blog1',    t:'Write and publish blog post: "How AI is cutting customs declaration time from hours to minutes for EU brokers" â target TARIC, EDS, UCC as SEO keywords' },
-        { id:'p4-blog2',    t:'Write and publish blog post: "TARIC Classification in 2026: manual vs AI â what the accuracy gap costs your brokerage every month" â use real LETT 2000 stats' },
-        { id:'p4-livid',    t:'Post a short LinkedIn video showing the live Declaration AI workflow â share actively into Customs Brokers and EU Trade Compliance LinkedIn groups, target 2,000+ views' },
-        { id:'p4-article',  t:'Publish long-form LinkedIn article on AI in EU customs compliance â target customs professional audience, include competitive landscape context and regulatory angles' },
-        { id:'p4-seo',      t:'Complete SEO setup: meta descriptions, schema markup, XML sitemap, Google Search Console verification â target 10 priority keywords across EU customs declaration software space' },
+        { id:'p4-blog1',    t:'Write and publish blog post: "How AI is cutting customs declaration time from hours to minutes for EU brokers" — target TARIC, EDS, UCC as SEO keywords' },
+        { id:'p4-blog2',    t:'Write and publish blog post: "TARIC Classification in 2026: manual vs AI — what the accuracy gap costs your brokerage every month" — use real LETT 2000 stats' },
+        { id:'p4-livid',    t:'Post a short LinkedIn video showing the live Declaration AI workflow — share actively into Customs Brokers and EU Trade Compliance LinkedIn groups, target 2,000+ views' },
+        { id:'p4-article',  t:'Publish long-form LinkedIn article on AI in EU customs compliance — target customs professional audience, include competitive landscape context and regulatory angles' },
+        { id:'p4-seo',      t:'Complete SEO setup: meta descriptions, schema markup, XML sitemap, Google Search Console verification — target 10 priority keywords across EU customs declaration software space' },
       ]},
       { t:'INBOUND PIPELINE SETUP', tasks:[
-        { id:'p4-funnel',   t:'Build demo booking funnel: landing page CTA â Calendly booking page â automated confirmation email with prep materials â heasure conversion rate at every step' },
+        { id:'p4-funnel',   t:'Build demo booking funnel: landing page CTA → Calendly booking page → automated confirmation email with prep materials — heasure conversion rate at every step' },
         { id:'p4-nurture',  t:'Set up 3-email nurture sequence for all demo form signups: (1) welcome + product overview, (2) LETT 2000 case study, (3) demo call invitation with specific times' },
-        { id:'p4-leadtrk',  t:'Set up lead source tracking in Declaration AI Leads module â attribute each lead to channel: outbound email, LinkedIn, Google Ads, referral, organic search' },
-        { id:'p4-eulists',  t:'Compile or purchase EU customs broker contact lists for Estonia, Lithuania, and Netherlands â preparation for Phase 6 Baltic expansion outbound campaign' },
+        { id:'p4-leadtrk',  t:'Set up lead source tracking in Declaration AI Leads module — attribute each lead to channel: outbound email, LinkedIn, Google Ads, referral, organic search' },
+        { id:'p4-eulists',  t:'Compile or purchase EU customs broker contact lists for Estonia, Lithuania, and Netherlands — preparation for Phase 6 Baltic expansion outbound campaign' },
       ]},
     ]
   },
   { id:'p5', num:'05', color:'#ec4899',
-    title:'Investor Fundraising â Pre-Seed',
-    timeline:'Months 4â7 Â· JunâSep 2026',
-    goal:'Raise â¬300Kâ600K pre-seed after securing 2+ paying customers. Target Baltic and EU B2B SaaS investors. Use capital for Baltic EDS adapters, first sales hire, and marketing. Digicust raised â¬2.3M pre-Series A â the market is investable and timing is right.',
-    tags:['â¬300Kâ600K target','Investor pitch deck','Baltic VCs: Tera, Karma, SWG','Data room ready'],
+    title:'Investor Fundraising — Pre-Seed',
+    timeline:'Months 4–7 · Jun–Sep 2026',
+    goal:'Raise €300K–600K pre-seed after securing 2+ paying customers. Target Baltic and EU B2B SaaS investors. Use capital for Baltic EDS adapters, first sales hire, and marketing. Digicust raised €2.3M pre-Series A — the market is investable and timing is right.',
+    tags:['€300K–600K target','Investor pitch deck','Baltic VCs: Tera, Karma, SWG','Data room ready'],
     sections:[
-      { t:'FUNDRAISING MATERIALS â WEEKS 1â3', tasks:[
-        { id:'p5-model',   t:'Build a 24-month financial model: current MRR base, 20â30% MoM growth assumption, CAC per channel, LTV per pricing tier, burn rate, runway post-raise â have a bear and bull case' },
-        { id:'p5-deck',    t:'Build investor pitch deck (12â15 slides): Problem â EU Market Size (SMB broker count Ã avg tech spend) â Solution â Traction (MRR + declarations) â Competition matrix â Team â Ask + Use of Funds' },
+      { t:'FUNDRAISING MATERIALS — WEEKS 1–3', tasks:[
+        { id:'p5-model',   t:'Build a 24-month financial model: current MRR base, 20–30% MoM growth assumption, CAC per channel, LTV per pricing tier, burn rate, runway post-raise — have a bear and bull case' },
+        { id:'p5-deck',    t:'Build investor pitch deck (12–15 slides): Problem → EU Market Size (SMB broker count × avg tech spend) → Solution → Traction (MRR + declarations) → Competition matrix → Team → Ask + Use of Funds' },
         { id:'p5-dataroom',t:'Compile investor data room: product demo recording, MRR monthly progression, customer contracts or LOIs, competitor analysis PDF, team bios, legal incorporation documents, cap table' },
-        { id:'p5-market',  t:'Research and document TAM/SAM/SOM: number of licensed EU customs brokers per country Ã average software spend per broker per year â cite authoritative sources' },
-        { id:'p5-refltr',  t:'Get customer reference letters from LETT 2000 and at least 1 paying external customer â signed quotes and willingness to speak with investors on request' },
-        { id:'p5-terms',   t:'Define raise structure: â¬300Kâ600K at â¬1.5â3M post-money valuation. Prepare SAFE note or convertible note template with standard Baltic/EU early-stage terms' },
+        { id:'p5-market',  t:'Research and document TAM/SAM/SOM: number of licensed EU customs brokers per country × average software spend per broker per year — cite authoritative sources' },
+        { id:'p5-refltr',  t:'Get customer reference letters from LETT 2000 and at least 1 paying external customer — signed quotes and willingness to speak with investors on request' },
+        { id:'p5-terms',   t:'Define raise structure: €300K–600K at €1.5–3M post-money valuation. Prepare SAFE note or convertible note template with standard Baltic/EU early-stage terms' },
       ]},
-      { t:'BALTIC & CEE INVESTORS â WEEKS 3â7', tasks:[
-        { id:'p5-tera',    t:'Apply to Tera Ventures (Tallinn) â largest Baltic VC, invests â¬200Kâ2M at seed in B2B SaaS. Lead with MRR traction and multi-market expansion roadmap. Warm intro strongly preferred.' },
-        { id:'p5-karma',   t:'Apply to Karma Ventures (Estonia) â â¬50Kâ500K tickets, Baltic/Nordic focus, known for being hands-on with early-stage B2B tech. Check their current fund vintage before applying.' },
-        { id:'p5-swg',     t:'Apply to Startup Wise Guys (Riga/Tallinn cohorts) â accelerator + â¬50â150K investment, strong CEE distribution network, quarterly applications. Strong fit for cross-Baltic expansion story.' },
-        { id:'p5-bba',     t:'Submit to Baltic Business Angels (BBA) network â individual angels with Baltic industry networks, fast decision-making at pre-seed stage, often add strategic operational value' },
-        { id:'p5-liaa',    t:'Apply to LIAA (Latvian Investment and Development Agency) innovation grants â non-dilutive funding for AI and digital tech. Research JaunuzÅÄmumu grantu programma and EIF schemes' },
-        { id:'p5-lift99',  t:'Connect with Lift99 hub (Tallinn) â strong investor introduction network across CEE, access to Estonian tech ecosystem and angels with logistics background' },
-        { id:'p5-estban',  t:'Reach out to EstBAN (Estonian Business Angels Network) and Tallinn-area angel groups â angels often commit at pre-seed faster and with less bureaucracy than institutional VCs' },
+      { t:'BALTIC & CEE INVESTORS — WEEKS 3–7', tasks:[
+        { id:'p5-tera',    t:'Apply to Tera Ventures (Tallinn) — largest Baltic VC, invests €200K–2M at seed in B2B SaaS. Lead with MRR traction and multi-market expansion roadmap. Warm intro strongly preferred.' },
+        { id:'p5-karma',   t:'Apply to Karma Ventures (Estonia) — €50K–500K tickets, Baltic/Nordic focus, known for being hands-on with early-stage B2B tech. Check their current fund vintage before applying.' },
+        { id:'p5-swg',     t:'Apply to Startup Wise Guys (Riga/Tallinn cohorts) — accelerator + €50–150K investment, strong CEE distribution network, quarterly applications. Strong fit for cross-Baltic expansion story.' },
+        { id:'p5-bba',     t:'Submit to Baltic Business Angels (BBA) network — individual angels with Baltic industry networks, fast decision-making at pre-seed stage, often add strategic operational value' },
+        { id:'p5-liaa',    t:'Apply to LIAA (Latvian Investment and Development Agency) innovation grants — non-dilutive funding for AI and digital tech. Research Jaunuzņēmumu grantu programma and EIF schemes' },
+        { id:'p5-lift99',  t:'Connect with Lift99 hub (Tallinn) — strong investor introduction network across CEE, access to Estonian tech ecosystem and angels with logistics background' },
+        { id:'p5-estban',  t:'Reach out to EstBAN (Estonian Business Angels Network) and Tallinn-area angel groups — angels often commit at pre-seed faster and with less bureaucracy than institutional VCs' },
       ]},
-      { t:'EU & LOGISTICS INVESTORS â WEEKS 5â10', tasks:[
-        { id:'p5-regtech',  t:'Research and contact RegTech/FinTech VCs: Anthemis Group, Illuminate Financial, FinTech Global â position Declaration AI as RegTech for EU trade compliance automation' },
-        { id:'p5-logvcs',   t:'Research logistics/supply chain VCs: Reefknot Investments, Dynamo Ventures, Container Ventures â frame as AI infrastructure layer for EU trade document flows' },
-        { id:'p5-angels',   t:'Target angels with customs/freight forwarding background â search FIATA member directory, ex-DHL/DB Schenker/Kuehne+Nagel executive networks on LinkedIn' },
-        { id:'p5-events',   t:'Attend Baltic and EU startup events to build investor network: Latitude59 (Tallinn), Wolves Summit, Slush (Helsinki) â always bring printed one-pager and QR-code deck link' },
-        { id:'p5-intros',   t:'Prioritise warm introductions over cold outreach everywhere â ask LIAA advisors, SWG alumni, Tera portfolio founders for specific named introductions' },
+      { t:'EU & LOGISTICS INVESTORS — WEEKS 5–10', tasks:[
+        { id:'p5-regtech',  t:'Research and contact RegTech/FinTech VCs: Anthemis Group, Illuminate Financial, FinTech Global — position Declaration AI as RegTech for EU trade compliance automation' },
+        { id:'p5-logvcs',   t:'Research logistics/supply chain VCs: Reefknot Investments, Dynamo Ventures, Container Ventures — frame as AI infrastructure layer for EU trade document flows' },
+        { id:'p5-angels',   t:'Target angels with customs/freight forwarding background — search FIATA member directory, ex-DHL/DB Schenker/Kuehne+Nagel executive networks on LinkedIn' },
+        { id:'p5-events',   t:'Attend Baltic and EU startup events to build investor network: Latitude59 (Tallinn), Wolves Summit, Slush (Helsinki) — always bring printed one-pager and QR-code deck link' },
+        { id:'p5-intros',   t:'Prioritise warm introductions over cold outreach everywhere — ask LIAA advisors, SWG alumni, Tera portfolio founders for specific named introductions' },
       ]},
-      { t:'CLOSING THE ROUND â WEEKS 10â14', tasks:[
-        { id:'p5-shortlist', t:'Shortlist 3â5 serious investors for term sheet discussions â prioritise those with B2B SaaS portfolio relevance AND Baltic or EU expansion network value' },
-        { id:'p5-termsheet', t:'Negotiate term sheet: valuation cap, pro-rata rights for follow-ons, information rights. Avoid board seat at pre-seed. Target maximum 15â20% dilution.' },
-        { id:'p5-legal',     t:'Engage a startup-specialist lawyer (Ellex, SORAINEN, or TGS Baltic) for investment document review â never sign a term sheet or investment agreement without independent legal review' },
-        { id:'p5-close',     t:'Execute agreements, receive funds, update cap table, set up dedicated fundraise bank account â maintain clean accounting separation from operating expenses from day one' },
+      { t:'CLOSING THE ROUND — WEEKS 10–14', tasks:[
+        { id:'p5-shortlist', t:'Shortlist 3–5 serious investors for term sheet discussions — prioritise those with B2B SaaS portfolio relevance AND Baltic or EU expansion network value' },
+        { id:'p5-termsheet', t:'Negotiate term sheet: valuation cap, pro-rata rights for follow-ons, information rights. Avoid board seat at pre-seed. Target maximum 15–20% dilution.' },
+        { id:'p5-legal',     t:'Engage a startup-specialist lawyer (Ellex, SORAINEN, or TGS Baltic) for investment document review — never sign a term sheet or investment agreement without independent legal review' },
+        { id:'p5-close',     t:'Execute agreements, receive funds, update cap table, set up dedicated fundraise bank account — maintain clean accounting separation from operating expenses from day one' },
         { id:'p5-announce',  t:'Announce fundraise publicly: LinkedIn post, press release to tech.eu, eu-startups.com, and Baltic tech media. Use the announcement as a recruiting signal and credibility boost.' },
       ]},
     ]
   },
   { id:'p6', num:'06', color:'#06b6d4',
-    title:'Baltic States Expansion â Estonia & Lithuania',
-    timeline:'Months 6â9 Â· AugâNov 2026',
-    goal:'Expand Declaration AI to Estonia and Lithuania by building country-specific EDS output adapters. Reach 8â12 paying customers across all three Baltic states. Hit â¬8K MRR and prove the multi-market roll-out playbook works.',
-    tags:['Estonia EMTA adapter','Lithuania MIDAS adapter','8â12 paying customers','â¬8K MRR'],
+    title:'Baltic States Expansion — Estonia & Lithuania',
+    timeline:'Months 6–9 · Aug–Nov 2026',
+    goal:'Expand Declaration AI to Estonia and Lithuania by building country-specific EDS output adapters. Reach 8–12 paying customers across all three Baltic states. Hit €8K MRR and prove the multi-market roll-out playbook works.',
+    tags:['Estonia EMTA adapter','Lithuania MIDAS adapter','8–12 paying customers','€8K MRR'],
     sections:[
       { t:'ESTONIA EXPANSION', tasks:[
-        { id:'p6-ee-res',    t:'Research Estonia EMTA customs declaration system (MKD â Maksu- ja Tolliamet): XML format specification, authentication method, submission API documentation' },
-        { id:'p6-ee-adapt',  t:'Build Estonia EDS adapter: generate EMTA-compliant XML/JSON output from existing Declaration AI data model â test against EMTA sandbox environment' },
-        { id:'p6-ee-taric',  t:'Update TARIC Memory with Estonia-specific regulatory codes and classification patterns â Estonia shares EU TARIC but has some EE-specific additional codes' },
-        { id:'p6-ee-test',   t:'Test Estonia adapter with 1â2 Estonia-based pilot brokers â run 15+ real declarations, validate XML output against EMTA system requirements before go-live' },
-        { id:'p6-ee-out',    t:'Run targeted outreach to 20+ Estonian customs brokers â use Tera Ventures portfolio and Lift99 network for warm introductions to Tallinn and Tartu brokers' },
-        { id:'p6-ee-sign',   t:'ð¯ Sign 2â3 paying Estonian customers â validates the Baltic roll-out model and significantly strengthens the Series A investor narrative' },
+        { id:'p6-ee-res',    t:'Research Estonia EMTA customs declaration system (MKD — Maksu- ja Tolliamet): XML format specification, authentication method, submission API documentation' },
+        { id:'p6-ee-adapt',  t:'Build Estonia EDS adapter: generate EMTA-compliant XML/JSON output from existing Declaration AI data model — test against EMTA sandbox environment' },
+        { id:'p6-ee-taric',  t:'Update TARIC Memory with Estonia-specific regulatory codes and classification patterns — Estonia shares EU TARIC but has some EE-specific additional codes' },
+        { id:'p6-ee-test',   t:'Test Estonia adapter with 1–2 Estonia-based pilot brokers — run 15+ real declarations, validate XML output against EMTA system requirements before go-live' },
+        { id:'p6-ee-out',    t:'Run targeted outreach to 20+ Estonian customs brokers — use Tera Ventures portfolio and Lift99 network for warm introductions to Tallinn and Tartu brokers' },
+        { id:'p6-ee-sign',   t:'🎯 Sign 2–3 paying Estonian customers — validates the Baltic roll-out model and significantly strengthens the Series A investor narrative' },
       ]},
       { t:'LITHUANIA EXPANSION', tasks:[
-        { id:'p6-lt-res',    t:'Research Lithuania MuitinÄs departamentas customs system and MIDAS declaration portal: XML format requirements, field mapping, submission workflow' },
-        { id:'p6-lt-adapt',  t:'Build Lithuania MIDAS-compatible adapter: generate Lithuania-specific XML output from Declaration AI data model â test against available sandbox' },
-        { id:'p6-lt-test',   t:'Test Lithuania adapter with a Vilnius or Klaipeda pilot customs broker â Klaipeda port handles the highest import volumes in Lithuania' },
-        { id:'p6-lt-assoc',  t:'Contact Lithuanian Customs Agents Association (LCBA) â request member outreach opportunity, newsletter feature, or conference sponsor slot' },
-        { id:'p6-lt-out',    t:'Run outreach to 20+ Lithuanian customs brokers â focus on Vilnius (administrative hub) and Klaipeda (port-heavy, highest declaration volumes per broker)' },
-        { id:'p6-lt-sign',   t:'ð¯ Sign 2â3 paying Lithuanian customers â Baltic trifecta (LV + EE + LT) is a powerful proof-of-concept for investors and a defensible regional moat' },
+        { id:'p6-lt-res',    t:'Research Lithuania Muitinės departamentas customs system and MIDAS declaration portal: XML format requirements, field mapping, submission workflow' },
+        { id:'p6-lt-adapt',  t:'Build Lithuania MIDAS-compatible adapter: generate Lithuania-specific XML output from Declaration AI data model — test against available sandbox' },
+        { id:'p6-lt-test',   t:'Test Lithuania adapter with a Vilnius or Klaipeda pilot customs broker — Klaipeda port handles the highest import volumes in Lithuania' },
+        { id:'p6-lt-assoc',  t:'Contact Lithuanian Customs Agents Association (LCBA) — request member outreach opportunity, newsletter feature, or conference sponsor slot' },
+        { id:'p6-lt-out',    t:'Run outreach to 20+ Lithuanian customs brokers — focus on Vilnius (administrative hub) and Klaipeda (port-heavy, highest declaration volumes per broker)' },
+        { id:'p6-lt-sign',   t:'🎯 Sign 2–3 paying Lithuanian customers — Baltic trifecta (LV + EE + LT) is a powerful proof-of-concept for investors and a defensible regional moat' },
       ]},
       { t:'MULTI-COUNTRY PRODUCT', tasks:[
-        { id:'p6-ctrysel',   t:'Build country selector in Declaration Processor UI: user selects Latvia / Estonia / Lithuania at session or declaration level â system routes to correct EDS output adapter' },
-        { id:'p6-routing',   t:'Implement EDS output routing engine: Latvia (existing EDS XML), Estonia (EMTA XML adapter), Lithuania (MIDAS XML adapter) â single codebase, country-configurable output' },
-        { id:'p6-pricing',   t:'Update pricing tiers: single-country â¬500â1,200/mo, Baltic multi-country package â¬1,500â2,500/mo â define a clear upgrade path from single-market to multi-market' },
-        { id:'p6-lpupdate',  t:'Update landing page: "Supports Latvia, Estonia, Lithuania customs systems" â positions Declaration AI as the go-to tool for Baltic brokers operating cross-border' },
-        { id:'p6-mrr8k',     t:'ð¯ Hit â¬8,000 MRR across all three Baltic markets â triggers readiness for EU westward expansion phase and prepares the Series A traction story' },
+        { id:'p6-ctrysel',   t:'Build country selector in Declaration Processor UI: user selects Latvia / Estonia / Lithuania at session or declaration level → system routes to correct EDS output adapter' },
+        { id:'p6-routing',   t:'Implement EDS output routing engine: Latvia (existing EDS XML), Estonia (EMTA XML adapter), Lithuania (MIDAS XML adapter) — single codebase, country-configurable output' },
+        { id:'p6-pricing',   t:'Update pricing tiers: single-country €500–1,200/mo, Baltic multi-country package €1,500–2,500/mo — define a clear upgrade path from single-market to multi-market' },
+        { id:'p6-lpupdate',  t:'Update landing page: "Supports Latvia, Estonia, Lithuania customs systems" — positions Declaration AI as the go-to tool for Baltic brokers operating cross-border' },
+        { id:'p6-mrr8k',     t:'🎯 Hit €8,000 MRR across all three Baltic markets — triggers readiness for EU westward expansion phase and prepares the Series A traction story' },
       ]},
     ]
   },
   { id:'p7', num:'07', color:'#ef4444',
-    title:'EU Expansion â Germany, Netherlands & ICS2 Module',
-    timeline:'Months 9â12 Â· Nov 2026âMar 2027',
-    goal:'Enter Germany (ATLAS system) and Netherlands markets. Build the ICS2 pre-arrival safety declaration module â a key regulatory differentiator most SMB tools lack. Target 15â20 paying customers total and â¬15K+ MRR. Prepare for Series A.',
+    title:'EU Expansion — Germany, Netherlands & ICS2 Module',
+    timeline:'Months 9–12 · Nov 2026–Mar 2027',
+    goal:'Enter Germany (ATLAS system) and Netherlands markets. Build the ICS2 pre-arrival safety declaration module — a key regulatory differentiator most SMB tools lack. Target 15–20 paying customers total and €15K+ MRR. Prepare for Series A.',
     tags:['Germany ATLAS adapter','Netherlands AGS adapter','ICS2 pre-arrival module','Series A prep'],
     sections:[
-      { t:'GERMANY â ATLAS INTEGRATION', tasks:[
-        { id:'p7-de-res',    t:'Deep-dive Germany Zoll ATLAS system: CUSDEC XML format (UN/EDIFACT), AES export requirements, NCTS transit declarations â engage a German customs compliance specialist for guidance' },
-        { id:'p7-de-part',   t:'Identify a German customs tech partner or compliance advisor for ATLAS regulatory review â ATLAS is highly regulated and complex; local expertise is essential to avoid costly errors' },
-        { id:'p7-de-adapt',  t:'Build Germany ATLAS adapter: CUSDEC-format output for AES (export declarations) and NCTS (transit) â test against Zoll official sandbox environment' },
-        { id:'p7-de-pilot',  t:'Test ATLAS adapter with 1â2 German broker pilots in Hamburg or Duisburg â the largest freight hub clusters in Germany, highest declaration volumes' },
-        { id:'p7-de-out',    t:'Run outreach campaign to 30+ German customs brokers and freight forwarders â focus on Hamburg, Bremen, Frankfurt, Duisburg clusters â use DSLV and BGA member directories' },
-        { id:'p7-de-sign',   t:'ð¯ Sign 3â5 German paying customers at â¬1,000â2,000/month â German market has higher pricing tolerance than Baltics due to larger declaration volumes per broker' },
+      { t:'GERMANY — ATLAS INTEGRATION', tasks:[
+        { id:'p7-de-res',    t:'Deep-dive Germany Zoll ATLAS system: CUSDEC XML format (UN/EDIFACT), AES export requirements, NCTS transit declarations — engage a German customs compliance specialist for guidance' },
+        { id:'p7-de-part',   t:'Identify a German customs tech partner or compliance advisor for ATLAS regulatory review — ATLAS is highly regulated and complex; local expertise is essential to avoid costly errors' },
+        { id:'p7-de-adapt',  t:'Build Germany ATLAS adapter: CUSDEC-format output for AES (export declarations) and NCTS (transit) — test against Zoll official sandbox environment' },
+        { id:'p7-de-pilot',  t:'Test ATLAS adapter with 1–2 German broker pilots in Hamburg or Duisburg — the largest freight hub clusters in Germany, highest declaration volumes' },
+        { id:'p7-de-out',    t:'Run outreach campaign to 30+ German customs brokers and freight forwarders — focus on Hamburg, Bremen, Frankfurt, Duisburg clusters — use DSLV and BGA member directories' },
+        { id:'p7-de-sign',   t:'🎯 Sign 3–5 German paying customers at €1,000–2,000/month — German market has higher pricing tolerance than Baltics due to larger declaration volumes per broker' },
       ]},
       { t:'NETHERLANDS EXPANSION', tasks:[
         { id:'p7-nl-res',    t:'Research Netherlands Douane AGS system (Aangiftesysteem Goederen): XML field requirements, submission API, Rotterdam and Schiphol air cargo-specific workflow considerations' },
-        { id:'p7-nl-adapt',  t:'Build Netherlands AGS adapter â Netherlands is the #1 EU import gateway (Rotterdam port), so the average broker handles very high declaration volumes' },
-        { id:'p7-nl-out',    t:'Outreach to Rotterdam and Amsterdam customs brokers and freight forwarders â prioritise those handling Schiphol air cargo and Rotterdam sea freight flows' },
-        { id:'p7-nl-sign',   t:'ð¯ Sign 2â3 Netherlands paying customers â BeNeLux foothold also opens the door for a white-label partnership discussion with Stream Software' },
+        { id:'p7-nl-adapt',  t:'Build Netherlands AGS adapter — Netherlands is the #1 EU import gateway (Rotterdam port), so the average broker handles very high declaration volumes' },
+        { id:'p7-nl-out',    t:'Outreach to Rotterdam and Amsterdam customs brokers and freight forwarders — prioritise those handling Schiphol air cargo and Rotterdam sea freight flows' },
+        { id:'p7-nl-sign',   t:'🎯 Sign 2–3 Netherlands paying customers — BeNeLux foothold also opens the door for a white-label partnership discussion with Stream Software' },
       ]},
       { t:'ICS2 PRE-ARRIVAL SAFETY FILING MODULE', tasks:[
-        { id:'p7-ics2-res',  t:'Research ICS2 (Import Control System 2) requirements in full: Entry Summary Declaration (ENS) field requirements, filing timelines (4h/24h before arrival), who is obligated â broker vs carrier' },
+        { id:'p7-ics2-res',  t:'Research ICS2 (Import Control System 2) requirements in full: Entry Summary Declaration (ENS) field requirements, filing timelines (4h/24h before arrival), who is obligated — broker vs carrier' },
         { id:'p7-ics2-scp',  t:'Scope the ICS2 module: which data from existing extraction pipeline is reusable, what new fields are required (UCR, LRN, safety data), UI design for the pre-arrival filing flow' },
-        { id:'p7-ics2-bld',  t:'Build ICS2 pre-arrival safety declaration module â integrate with the document upload and extraction pipeline, generate ICS2-compliant XML for EU Customs Data Hub submission' },
-        { id:'p7-ics2-tst',  t:'Test ICS2 module with customers handling Riga air cargo (LV000240 Lidostas MKP) â air imports require 4-hour pre-arrival filing, the ideal real-world test case' },
-        { id:'p7-ics2-mkt',  t:'Actively market the ICS2 capability â most SMB tools including Digicust and Customs4trade have limited ICS2 coverage. Feature prominently on landing page and LinkedIn.' },
+        { id:'p7-ics2-bld',  t:'Build ICS2 pre-arrival safety declaration module — integrate with the document upload and extraction pipeline, generate ICS2-compliant XML for EU Customs Data Hub submission' },
+        { id:'p7-ics2-tst',  t:'Test ICS2 module with customers handling Riga air cargo (LV000240 Lidostas MKP) — air imports require 4-hour pre-arrival filing, the ideal real-world test case' },
+        { id:'p7-ics2-mkt',  t:'Actively market the ICS2 capability — most SMB tools including Digicust and Customs4trade have limited ICS2 coverage. Feature prominently on landing page and LinkedIn.' },
       ]},
       { t:'SCALE & SERIES A PREPARATION', tasks:[
-        { id:'p7-hire-s',    t:'Make first sales/BD hire using raised capital â ideally German or Dutch speaking with customs or logistics background, immediately owns DE and NL pipeline and deal execution' },
-        { id:'p7-hire-cs',   t:'Hire a Customer Success manager â once the customer count exceeds 10, CS quality becomes a retention and expansion risk that cannot be managed by the founding team alone' },
-        { id:'p7-mrr15k',    t:'ð¯ Hit â¬15,000 MRR across LV + EE + LT + DE + NL â the minimum credible threshold for Series A conversations with top-tier EU B2B SaaS investors' },
-        { id:'p7-cust20',    t:'ð¯ Reach 20 paying customers across 5 markets â proves the multi-market GTM playbook is repeatable, which is the core Series A investment thesis' },
-        { id:'p7-series-a',  t:'Prepare Series A materials: 18-month cohort retention data, NRR, churn rate, CAC by market, unit economics per tier â target â¬2â5M Series A at 5â8Ã ARR valuation' },
-        { id:'p7-sa-vcs',    t:'Outreach to EU-focused Series A VCs: Balderton Capital, Point Nine Capital, Northzone, Target Global, Dawn Capital â all have strong B2B SaaS and RegTech portfolios' },
+        { id:'p7-hire-s',    t:'Make first sales/BD hire using raised capital — ideally German or Dutch speaking with customs or logistics background, immediately owns DE and NL pipeline and deal execution' },
+        { id:'p7-hire-cs',   t:'Hire a Customer Success manager — once the customer count exceeds 10, CS quality becomes a retention and expansion risk that cannot be managed by the founding team alone' },
+        { id:'p7-mrr15k',    t:'🎯 Hit €15,000 MRR across LV + EE + LT + DE + NL — the minimum credible threshold for Series A conversations with top-tier EU B2B SaaS investors' },
+        { id:'p7-cust20',    t:'🎯 Reach 20 paying customers across 5 markets — proves the multi-market GTM playbook is repeatable, which is the core Series A investment thesis' },
+        { id:'p7-series-a',  t:'Prepare Series A materials: 18-month cohort retention data, NRR, churn rate, CAC by market, unit economics per tier — target €2–5M Series A at 5–8× ARR valuation' },
+        { id:'p7-sa-vcs',    t:'Outreach to EU-focused Series A VCs: Balderton Capital, Point Nine Capital, Northzone, Target Global, Dawn Capital — all have strong B2B SaaS and RegTech portfolios' },
       ]},
     ]
   },
 ];
 
-/* ââ STATE ââ */
+/* ── STATE ── */
 let state = {
   checked: {}, kpis: { kpi_cust:0, kpi_mrr:0, kpi_ctry:0, kpi_cap:0 },
   collapsed: {}, members: [], assignments: {}, customTasks: {},
 };
 let _timer = null, _suppress = false;
 
-/* ââ HELPERS ââ */
+/* ── HELPERS ── */
 function customTasksForSec(phId, si) { return (state.customTasks[phId+'_'+si])||[]; }
 function allTasks() {
   const r=[];
@@ -511,7 +511,7 @@ function activePh() {
   return PHASES.length-1;
 }
 
-/* ââ SUPABASE ââ */
+/* ── SUPABASE ── */
 async function loadState() {
   const {data,error} = await sb.from('gtm_state').select('data').eq('id',1).single();
   if(error){setSS('error','Load failed');return;}
@@ -519,17 +519,17 @@ async function loadState() {
 }
 function schedSave() { clearTimeout(_timer); _timer=setTimeout(persist,800); }
 async function persist() {
-  setSS('syncing','Savingâ¦'); _suppress=true;
+  setSS('syncing','Saving…'); _suppress=true;
   const {error}=await sb.from('gtm_state').update({data:state,updated_at:new Date().toISOString()}).eq('id',1);
   if(error){setSS('error','Save failed');_suppress=false;return;}
-  setSS('synced','â Synced'); setTimeout(()=>setSS('synced','â Live'),1500);
+  setSS('synced','✓ Synced'); setTimeout(()=>setSS('synced','✓ Live'),1500);
 }
 function setupRT() {
   sb.channel('gtm_ch').on('postgres_changes',{event:'UPDATE',schema:'public',table:'gtm_state',filter:'id=eq.1'},(p)=>{
     if(_suppress){_suppress=false;return;}
     const r=p.new.data;
-    if(r&&typeof r==='object'){state={...state,...r};renderAll();setSS('updated','â Updated');setTimeout(()=>setSS('synced','â Live'),2000);}
-  }).subscribe(s=>{if(s==='SUBSCRIBED')setSS('synced','â Live');});
+    if(r&&typeof r==='object'){state={...state,...r};renderAll();setSS('updated','↓ Updated');setTimeout(()=>setSS('synced','✓ Live'),2000);}
+  }).subscribe(s=>{if(s==='SUBSCRIBED')setSS('synced','✓ Live');});
 }
 function setSS(cls,txt) {
   const el=document.getElementById('sync-status');
@@ -538,7 +538,7 @@ function setSS(cls,txt) {
   dot.className='sync-dot'+(cls==='syncing'?' pulse':'');
 }
 
-/* ââ RENDER ââ */
+/* ── RENDER ── */
 function renderAll() {
   renderKpis(); renderFocus(); renderFilterBar(); renderPhases();
   document.getElementById('ovr-pct').textContent = totalAll()?Math.round(totalDone()/totalAll()*100):0;
@@ -560,8 +560,8 @@ function renderKpis() {
 function renderFocus() {
   const ph=PHASES[activePh()];
   document.getElementById('focus-section').innerHTML=`
-    <div class="focus-eyebrow">ð¯ CURRENT FOCUS</div>
-    <div class="focus-title">Phase ${ph.num} â ${ph.title}</div>
+    <div class="focus-eyebrow">🎯 CURRENT FOCUS</div>
+    <div class="focus-title">Phase ${ph.num} — ${ph.title}</div>
     <div class="focus-desc">${ph.goal}</div>
     <div class="focus-tags">${ph.tags.map(t=>`<span class="focus-tag">${t}</span>`).join('')}</div>`;
 }
@@ -612,7 +612,7 @@ function renderPhases() {
         </div>
         <div class="ph-right">
           <div><div class="phase-prog-count">${done}/${total}</div><div class="phase-prog-label">tasks done</div></div>
-          <div class="phase-chevron ${open?'open':''}">â¼</div>
+          <div class="phase-chevron ${open?'open':''}">▼</div>
         </div>
       </div>
       <div class="phase-progress-bar"><div class="phase-progress-fill" style="width:${pct}%"></div></div>
@@ -707,7 +707,7 @@ function showDrop(wrap,tid) {
     <div class="assign-option" data-mid="${m.id}">
       <span class="ao-avatar" style="background:${m.color}">${initials(m.name)}</span>${m.name}
     </div>`).join('')
-    + (mid?`<div class="assign-divider"></div><div class="assign-option" data-mid="__none"><span class="ao-avatar" style="background:#e2e8f0;color:#64748b">â</span>Unassign</div>`:'');
+    + (mid?`<div class="assign-divider"></div><div class="assign-option" data-mid="__none"><span class="ao-avatar" style="background:#e2e8f0;color:#64748b">✕</span>Unassign</div>`:'');
   d.querySelectorAll('.assign-option').forEach(opt=>opt.addEventListener('click',e=>{
     e.stopPropagation();
     const mid2=opt.dataset.mid;
@@ -754,7 +754,7 @@ function updatePhCard(card) {
   });
 }
 
-/* ââ MEMBER MODAL ââ */
+/* ── MEMBER MODAL ── */
 function renderMList() {
   const el=document.getElementById('m-list');
   el.innerHTML=state.members.length
@@ -762,7 +762,7 @@ function renderMList() {
       <div class="m-item">
         <div class="m-av" style="background:${m.color}">${initials(m.name)}</div>
         <div class="m-name">${m.name}</div>
-        <button class="m-rm" data-rmid="${m.id}" title="Remove">Ã</button>
+        <button class="m-rm" data-rmid="${m.id}" title="Remove">×</button>
       </div>`).join('')
     : '<div class="empty-m">No team members yet. Add one below.</div>';
   el.querySelectorAll('[data-rmid]').forEach(btn=>btn.onclick=()=>{
@@ -780,7 +780,7 @@ function renderSwatches() {
   document.querySelectorAll('.swatch').forEach(s=>s.onclick=()=>{selColor=s.dataset.c;renderSwatches();});
 }
 
-/* ââ EVENTS ââ */
+/* ── EVENTS ── */
 document.getElementById('team-btn').onclick=()=>{
   document.getElementById('team-overlay').classList.add('open');
   renderMList(); renderSwatches();
@@ -804,9 +804,9 @@ document.getElementById('reset-btn').onclick=()=>{
 };
 document.getElementById('save-btn').onclick=persist;
 
-/* ââ INIT ââ */
+/* ── INIT ── */
 (async function() {
-  setSS('syncing','Connectingâ¦');
+  setSS('syncing','Connecting…');
   PHASES.forEach((ph,i)=>{if(!(ph.id in state.collapsed))state.collapsed[ph.id]=i===0;});
   await loadState();
   PHASES.forEach((ph,i)=>{if(!(ph.id in state.collapsed))state.collapsed[ph.id]=i===0;});
