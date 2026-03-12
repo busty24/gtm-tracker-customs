@@ -150,6 +150,19 @@
     .swatch.sel { border-color: #0f1923; transform: scale(1.15); }
     .empty-m { color: #94a3b8; font-size: 13px; text-align: center; padding: 10px 0; }
 
+    /* Add Task */
+    .add-task-btn { display: flex; align-items: center; gap: 6px; background: none; border: 1px dashed #cbd5e1; color: #94a3b8; padding: 7px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; margin-top: 8px; transition: all .15s; width: 100%; justify-content: center; }
+    .add-task-btn:hover { border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,.04); }
+    .add-task-row { display: flex; align-items: center; gap: 8px; padding: 8px 2px; margin-top: 4px; }
+    .add-task-input { flex: 1; padding: 7px 12px; border: 1px solid #3b82f6; border-radius: 7px; font-size: 13px; outline: none; color: #1e293b; background: #f8fafc; }
+    .add-task-input::placeholder { color: #94a3b8; }
+    .add-task-confirm { background: #10b981; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .add-task-confirm:hover { background: #059669; }
+    .add-task-cancel { background: none; border: 1px solid #e2e8f0; color: #94a3b8; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .add-task-cancel:hover { color: #ef4444; border-color: #ef4444; }
+    .task-delete { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px; border-radius: 4px; flex-shrink: 0; transition: color .15s; }
+    .task-delete:hover { color: #ef4444; }
+
     @media (max-width: 640px) {
       header, #filter-bar, #kpi-section, #focus-section, #action-bar, #phases-container { padding-left: 14px; padding-right: 14px; }
       #kpi-section { grid-template-columns: 1fr 1fr; }
@@ -472,15 +485,20 @@ const PHASES = [
 /* ââ STATE ââ */
 let state = {
   checked: {}, kpis: { kpi_cust:0, kpi_mrr:0, kpi_ctry:0, kpi_cap:0 },
-  collapsed: {}, members: [], assignments: {},
+  collapsed: {}, members: [], assignments: {}, customTasks: {},
 };
 let _timer = null, _suppress = false;
 
 /* ââ HELPERS ââ */
-function allTasks() { const r=[]; PHASES.forEach(ph=>ph.sections.forEach(s=>s.tasks.forEach(t=>r.push(t)))); return r; }
+function customTasksForSec(phId, si) { return (state.customTasks[phId+'_'+si])||[]; }
+function allTasks() {
+  const r=[];
+  PHASES.forEach(ph=>ph.sections.forEach((s,si)=>{ s.tasks.forEach(t=>r.push(t)); customTasksForSec(ph.id,si).forEach(t=>r.push(t)); }));
+  return r;
+}
 function getTask(id) { return allTasks().find(t=>t.id===id); }
-function phDone(ph) { return ph.sections.flatMap(s=>s.tasks).filter(t=>state.checked[t.id]).length; }
-function phTotal(ph) { return ph.sections.flatMap(s=>s.tasks).length; }
+function phDone(ph) { return ph.sections.flatMap((s,si)=>[...s.tasks,...customTasksForSec(ph.id,si)]).filter(t=>state.checked[t.id]).length; }
+function phTotal(ph) { return ph.sections.flatMap((s,si)=>[...s.tasks,...customTasksForSec(ph.id,si)]).length; }
 function totalDone() { return allTasks().filter(t=>state.checked[t.id]).length; }
 function totalAll() { return allTasks().length; }
 function getMbr(id) { return state.members.find(m=>m.id===id); }
@@ -489,7 +507,7 @@ function initials(name) {
   return p.length===1 ? p[0].substring(0,2).toUpperCase() : (p[0][0]+p[p.length-1][0]).toUpperCase();
 }
 function activePh() {
-  for(let i=0;i<PHASES.length;i++) { if(PHASES[i].sections.flatMap(s=>s.tasks).some(t=>!state.checked[t.id])) return i; }
+  for(let i=0;i<PHASES.length;i++) { if(PHASES[i].sections.flatMap((s,si)=>[...s.tasks,...customTasksForSec(PHASES[i].id,si)]).some(t=>!state.checked[t.id])) return i; }
   return PHASES.length-1;
 }
 
@@ -497,7 +515,7 @@ function activePh() {
 async function loadState() {
   const {data,error} = await sb.from('gtm_state').select('data').eq('id',1).single();
   if(error){setSS('error','Load failed');return;}
-  if(data&&data.data&&Object.keys(data.data).length>0) state={...state,...data.data};
+  if(data&&data.data&&Object.keys(data.data).length>0) { state={...state,...data.data}; if(!state.customTasks) state.customTasks={}; }
 }
 function schedSave() { clearTimeout(_timer); _timer=setTimeout(persist,800); }
 async function persist() {
@@ -571,11 +589,18 @@ function renderPhases() {
   document.getElementById('phases-container').innerHTML = PHASES.map(ph=>{
     const done=phDone(ph), total=phTotal(ph), pct=total?Math.round(done/total*100):0;
     const open=state.collapsed[ph.id]!==false;
-    const secs=ph.sections.map(sec=>`
+    const secs=ph.sections.map((sec,si)=>{
+      const ct=customTasksForSec(ph.id,si);
+      const allSecTasks=[...sec.tasks,...ct];
+      const doneCount=allSecTasks.filter(t=>state.checked[t.id]).length;
+      return `
       <div class="phase-section">
-        <div class="section-header"><span>${sec.t}</span><span class="section-count">${sec.tasks.filter(t=>state.checked[t.id]).length}/${sec.tasks.length}</span></div>
-        ${sec.tasks.map(task=>taskRowHtml(task)).join('')}
-      </div>`).join('');
+        <div class="section-header"><span>${sec.t}</span><span class="section-count">${doneCount}/${allSecTasks.length}</span></div>
+        ${sec.tasks.map(task=>taskRowHtml(task,false)).join('')}
+        ${ct.map(task=>taskRowHtml(task,true)).join('')}
+        <button class="add-task-btn" data-phid="${ph.id}" data-si="${si}">+ Add Task</button>
+      </div>`;
+    }).join('');
     return `
     <div class="phase-card pc-${ph.id}" id="pc-${ph.id}">
       <div class="phase-header" data-pid="${ph.id}">
@@ -625,11 +650,39 @@ function renderPhases() {
     closeDrop(); openDropTask=tid; showDrop(wrap,tid);
   }));
 
+  // Add Task buttons
+  document.querySelectorAll('.add-task-btn').forEach(btn=>btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const phid=btn.dataset.phid, si=btn.dataset.si;
+    if(btn.nextElementSibling&&btn.nextElementSibling.classList.contains('add-task-row')) return;
+    const row=document.createElement('div'); row.className='add-task-row';
+    row.innerHTML=`<input type="text" class="add-task-input" placeholder="Describe the task\u2026" autofocus /><button class="add-task-confirm">Add</button><button class="add-task-cancel">Cancel</button>`;
+    btn.parentElement.insertBefore(row, btn.nextSibling);
+    const inp=row.querySelector('.add-task-input'); inp.focus();
+    function doAdd(){ const txt=inp.value.trim(); if(!txt){row.remove();return;} const key=phid+'_'+si; if(!state.customTasks[key])state.customTasks[key]=[]; state.customTasks[key].push({id:'ct_'+Date.now(),t:txt}); row.remove(); renderAll(); schedSave(); }
+    row.querySelector('.add-task-confirm').onclick=doAdd;
+    row.querySelector('.add-task-cancel').onclick=()=>row.remove();
+    inp.onkeydown=ev=>{if(ev.key==='Enter')doAdd();if(ev.key==='Escape')row.remove();};
+  }));
+
+  // Delete custom task buttons
+  document.querySelectorAll('.task-delete').forEach(btn=>btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const tid=btn.dataset.del;
+    if(!confirm('Delete this custom task?')) return;
+    for(const key of Object.keys(state.customTasks)){
+      state.customTasks[key]=state.customTasks[key].filter(t=>t.id!==tid);
+      if(state.customTasks[key].length===0) delete state.customTasks[key];
+    }
+    delete state.checked[tid]; delete state.assignments[tid];
+    renderAll(); schedSave();
+  }));
+
   document.addEventListener('click',()=>closeDrop());
   applyFilter();
 }
 
-function taskRowHtml(task) {
+function taskRowHtml(task, isCustom) {
   const chk=state.checked[task.id];
   const mid=state.assignments[task.id];
   const m=mid?getMbr(mid):null;
@@ -638,10 +691,11 @@ function taskRowHtml(task) {
     : `<div class="assign-avatar unassigned" title="Assign">+</div>`;
   const assignBtn = state.members.length
     ? `<div class="assign-wrap" data-tid="${task.id}" title="Assign to team member">${av}</div>` : '';
+  const delBtn = isCustom ? `<button class="task-delete" data-del="${task.id}" title="Delete task">&times;</button>` : '';
   return `<div class="task-row ${chk?'completed':''}" data-tid="${task.id}">
     <input type="checkbox" class="task-checkbox" data-tid="${task.id}" ${chk?'checked':''} />
     <span class="task-text">${task.t}</span>
-    ${assignBtn}
+    ${assignBtn}${delBtn}
   </div>`;
 }
 
@@ -694,9 +748,9 @@ function updatePhCard(card) {
   const done=phDone(ph), total=phTotal(ph), pct=total?Math.round(done/total*100):0;
   const pc=card.querySelector('.phase-prog-count'); if(pc) pc.textContent=`${done}/${total}`;
   const pf=card.querySelector('.phase-progress-fill'); if(pf) pf.style.width=pct+'%';
-  card.querySelectorAll('.phase-section').forEach(sec=>{
-    const sc=sec.querySelector('.section-count');
-    if(sc){const d2=sec.querySelectorAll('.task-row.completed').length,t2=sec.querySelectorAll('.task-row').length;sc.textContent=`${d2}/${t2}`;}
+  card.querySelectorAll('.phase-section').forEach(secEl=>{
+    const sc=secEl.querySelector('.section-count');
+    if(sc){const d2=secEl.querySelectorAll('.task-row.completed').length,t2=secEl.querySelectorAll('.task-row').length;sc.textContent=`${d2}/${t2}`;}
   });
 }
 
